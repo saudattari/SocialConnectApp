@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.example.socialconnect.CoilImage
 import com.example.socialconnect.R
 
 @Preview
@@ -44,10 +45,11 @@ fun SplashScreen() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            CoilImageLoader(
+            CoilImage.CoilImageLoader(
                 R.drawable.logo,
                 modifier = Modifier
-                    .size(200.dp)
+                    .size(200.dp),
+                colorFilter = ColorFilter.tint(Color.White)
             )
             Text(
                 text = "Social Linkup",
@@ -73,14 +75,14 @@ fun SplashScreen() {
 
     }
 }
-
-@Composable
-fun CoilImageLoader(url: Any, modifier: Modifier) {
-    AsyncImage(
-        model = url,
-        contentDescription = null,
-        modifier = modifier,
-        colorFilter = ColorFilter.tint(Color.White)
-    )
-
-}
+//
+//@Composable
+//fun CoilImageLoader(url: Any, modifier: Modifier) {
+//    AsyncImage(
+//        model = url,
+//        contentDescription = null,
+//        modifier = modifier,
+//        colorFilter = ColorFilter.tint(Color.White)
+//    )
+//
+//}
