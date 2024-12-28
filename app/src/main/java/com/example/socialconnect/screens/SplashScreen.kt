@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -39,13 +41,29 @@ fun SplashScreen() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            CoilImageLoader(R.drawable.logo.toString(), modifier = Modifier.size(200.dp))
+            CoilImageLoader(
+                R.drawable.logo,
+                modifier = Modifier
+                    .size(200.dp)
+            )
             Text(
                 text = "Social Connect",
                 modifier = Modifier,
-                color = Color.Black, fontSize = 30.sp,
+                color = Color.White, fontSize = 30.sp,
                 fontFamily = FontFamily.Cursive,
-                fontWeight = FontWeight.Black
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
+            Text(
+                text = "Develop by\nSaud",
+                modifier = Modifier,
+                color = Color.White, fontSize = 20.sp,
+                fontFamily = FontFamily.Serif,
+                fontWeight = FontWeight.ExtraBold
             )
         }
 
@@ -53,11 +71,12 @@ fun SplashScreen() {
 }
 
 @Composable
-fun CoilImageLoader(url:String,modifier: Modifier) {
+fun CoilImageLoader(url: Any, modifier: Modifier) {
     AsyncImage(
         model = url,
         contentDescription = null,
-        modifier = Modifier
+        modifier = modifier,
+        colorFilter = ColorFilter.tint(Color.White)
     )
 
 }
