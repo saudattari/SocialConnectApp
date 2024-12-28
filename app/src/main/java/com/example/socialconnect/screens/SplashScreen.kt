@@ -1,7 +1,5 @@
 package com.example.socialconnect.screens
 
-import android.window.SplashScreen
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -75,14 +73,3 @@ fun SplashScreen() {
 
     }
 }
-//
-//@Composable
-//fun CoilImageLoader(url: Any, modifier: Modifier) {
-//    AsyncImage(
-//        model = url,
-//        contentDescription = null,
-//        modifier = modifier,
-//        colorFilter = ColorFilter.tint(Color.White)
-//    )
-//
-//}
