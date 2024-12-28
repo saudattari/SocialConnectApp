@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -52,7 +53,7 @@ fun SplashScreen() {
                 text = "Social Linkup",
                 modifier = Modifier,
                 color = Color.White, fontSize = 30.sp,
-                fontFamily = FontFamily.Cursive,
+                fontFamily = FontFamily(Font(R.font.roboto_regular)),
                 fontWeight = FontWeight.ExtraBold
             )
         }
