@@ -1,6 +1,5 @@
 package com.example.socialconnect.screens
 
-import android.content.res.Resources.Theme
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,15 +9,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,6 +36,7 @@ import com.example.socialconnect.R
 @Preview
 @Composable
 fun LoginScreen() {
+    val scroll = rememberScrollState()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -45,9 +45,9 @@ fun LoginScreen() {
     {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(0.dp, 50.dp, 0.dp, 0.dp)
+                .verticalScroll(scroll)
+                .fillMaxSize()
+                .padding(vertical = 50.dp)
         ) {
 
 //            CoilImageLoader Function Calling
@@ -59,7 +59,7 @@ fun LoginScreen() {
                     .padding(0.dp, 6.dp),
                 colorFilter = null
             )
-//                Heading 
+//                Heading
             Text(
                 text = "See what people are talking about in the world",
                 modifier = Modifier
@@ -72,7 +72,8 @@ fun LoginScreen() {
             Spacer(modifier = Modifier.height(60.dp))
 //            Google Signup Button
             Button(
-                onClick = {},
+                onClick = {
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -91,7 +92,7 @@ fun LoginScreen() {
                     modifier = Modifier.padding(20.dp, 0.dp)
                 )
                 Text(
-                    text = "Sign up with Google",
+                    text = "Continue with Google",
                     fontFamily = FontFamily(Font(R.font.roboto_regular)),
                     fontSize = 18.sp
                 )

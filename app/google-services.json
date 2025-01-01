@@ -12,7 +12,20 @@
           "package_name": "com.example.socialconnect"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "369880025464-btlh238qkqqk43899903pdbf8mv942tc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.socialconnect",
+            "certificate_hash": "6bb29fd1c4d224581c062117812aea7f3545195d"
+          }
+        },
+        {
+          "client_id": "369880025464-l42pldr6lodi976aqfigpt7r6ftvuqs8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC-wVQMM_fiRN3SdO480HQc8PqVIvzS1lY"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "369880025464-l42pldr6lodi976aqfigpt7r6ftvuqs8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
