@@ -37,15 +37,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.socialconnect.CoilImage
 import com.example.socialconnect.R
+import com.example.socialconnect.navigation.NavigationRoute
 import com.example.socialconnect.ui.theme.clickColor
 import com.example.socialconnect.ui.theme.focusColor
 
 
-@Preview
 @Composable
-fun SignupScreen() {
+fun SignupScreen(navHostController: NavHostController) {
     val name = rememberSaveable { mutableStateOf("") }
     val email = rememberSaveable { mutableStateOf("") }
     val password = rememberSaveable { mutableStateOf("") }
@@ -150,7 +151,11 @@ fun SignupScreen() {
                 ) {
                     Text(text = "Already Have an account? ")
                     Text(
-                        text = "Login", Modifier.clickable { }, color = clickColor
+                        text = "Login", Modifier
+                            .clickable {
+                                navHostController.navigate(NavigationRoute.SignupScreen)
+                            },
+                        color = clickColor
                     )
                 }
             }

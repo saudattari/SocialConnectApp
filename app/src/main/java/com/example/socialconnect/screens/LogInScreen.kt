@@ -33,14 +33,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.socialconnect.CoilImage
 import com.example.socialconnect.R
+import com.example.socialconnect.navigation.NavigationRoute
 import com.example.socialconnect.ui.theme.clickColor
 import com.example.socialconnect.ui.theme.focusColor
 
 @Composable
-@Preview
-fun LogInScreen() {
+fun LogInScreen(navHostController: NavHostController) {
     val email = rememberSaveable { mutableStateOf("") }
     val password = rememberSaveable { mutableStateOf("") }
     Scaffold { innerPadding ->
@@ -131,7 +132,12 @@ fun LogInScreen() {
                 ) {
                     Text(text = "Don't have an account ")
                     Text(
-                        text = "Signup", Modifier.clickable { }, color = clickColor
+                        text = "Signup", Modifier
+                            .clickable {
+                            // Navigate to the signup screen
+                                navHostController.navigate(NavigationRoute.SignupScreen)
+                        },
+                        color = clickColor
                     )
                 }
             }

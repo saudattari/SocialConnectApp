@@ -30,12 +30,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.socialconnect.CoilImage
 import com.example.socialconnect.R
+import com.example.socialconnect.navigation.NavigationRoute
 
-@Preview
+//@Preview
 @Composable
-fun RegistrationScreen() {
+fun RegistrationScreen(navHostController: NavHostController) {
     val scroll = rememberScrollState()
     Box(
         modifier = Modifier
@@ -133,7 +135,9 @@ fun RegistrationScreen() {
                 Text(
                     text = "Login",
                     color = Color(0xFF1F9EFF),
-                    modifier = Modifier.clickable { }
+                    modifier = Modifier.clickable {
+                        navHostController.navigate(NavigationRoute.LoginScreen)
+                    }
 
                 )
             }

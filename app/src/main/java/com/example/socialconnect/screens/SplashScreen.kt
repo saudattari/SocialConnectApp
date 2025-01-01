@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -23,12 +24,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.socialconnect.CoilImage
 import com.example.socialconnect.R
+import com.example.socialconnect.navigation.NavigationRoute
+import kotlinx.coroutines.delay
 
-@Preview
+//@Preview
 @Composable
-fun SplashScreen() {
+fun SplashScreen(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -67,6 +71,16 @@ fun SplashScreen() {
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
+        }
+
+    }
+    LaunchedEffect(Unit) {
+        delay(2000)
+        // Navigate to the next screen after the delay
+        navController.navigate(NavigationRoute.RegistrationScreen){
+            popUpTo(NavigationRoute.SplashScreen){
+                inclusive = true      //this line will destroy the splashscreen
+            }
         }
 
     }
