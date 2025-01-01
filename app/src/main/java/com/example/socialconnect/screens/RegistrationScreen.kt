@@ -35,7 +35,7 @@ import com.example.socialconnect.R
 
 @Preview
 @Composable
-fun LoginScreen() {
+fun RegistrationScreen() {
     val scroll = rememberScrollState()
     Box(
         modifier = Modifier
