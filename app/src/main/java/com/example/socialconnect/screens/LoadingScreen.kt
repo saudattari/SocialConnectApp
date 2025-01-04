@@ -15,15 +15,15 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun LoadingScreen() {
 
-//    val isLoading = remember { mutableStateOf(false) }
-//    if (isLoading.value) {
-//        TODO()
-//    } else {
-//        Box(modifier = Modifier.fillMaxSize()) {
-//            CircularProgressIndicator(modifier = Modifier
-//                .align(Alignment.Center)
-//                .size(25.dp))
-//        }
-//    }
+    val isLoading = remember { mutableStateOf(false) }
+    if (isLoading.value) {
+        TODO()
+    } else {
+        Box(modifier = Modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier
+                .align(Alignment.Center)
+                .size(25.dp))
+        }
+    }
 
 }
