@@ -24,7 +24,9 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,9 +42,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.socialconnect.CoilImage
 import com.example.socialconnect.R
+import com.example.socialconnect.dataModel.Data
 import com.example.socialconnect.navigation.NavigationRoute
 import com.example.socialconnect.ui.theme.clickColor
 import com.example.socialconnect.ui.theme.focusColor
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 @Composable
@@ -50,6 +54,11 @@ fun SignupScreen(navHostController: NavHostController) {
     val name = rememberSaveable { mutableStateOf("") }
     val email = rememberSaveable { mutableStateOf("") }
     val password = rememberSaveable { mutableStateOf("") }
+    val db = FirebaseFirestore.getInstance()
+    val collect = db.collection("Users")
+    val list =  remember {
+        mutableStateListOf<Data>()
+    }
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier
@@ -153,7 +162,7 @@ fun SignupScreen(navHostController: NavHostController) {
                     Text(
                         text = "Login", Modifier
                             .clickable {
-                                navHostController.navigate(NavigationRoute.SignupScreen)
+                                navHostController.navigate(NavigationRoute.LoginScreen.route)
                             },
                         color = clickColor
                     )
@@ -165,7 +174,7 @@ fun SignupScreen(navHostController: NavHostController) {
                 text = "Developed by\nSaud",
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(20.dp),
+                    .padding(0.dp, 0.dp, 0.dp, 18.dp),
                 textAlign = TextAlign.Center
             )
         }

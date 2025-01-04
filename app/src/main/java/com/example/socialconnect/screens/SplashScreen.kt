@@ -21,7 +21,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -65,7 +64,7 @@ fun SplashScreen(navController: NavHostController) {
         ) {
             Text(
                 text = "Develop by\nSaud",
-                modifier = Modifier.padding(0.dp,0.dp,0.dp,6.dp),
+                modifier = Modifier.padding(0.dp,0.dp,0.dp,28.dp),
                 color = Color.White, fontSize = 18.sp,
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Bold,
@@ -73,15 +72,15 @@ fun SplashScreen(navController: NavHostController) {
             )
         }
 
-    }
+
     LaunchedEffect(Unit) {
         delay(2000)
         // Navigate to the next screen after the delay
-        navController.navigate(NavigationRoute.RegistrationScreen){
-            popUpTo(NavigationRoute.SplashScreen){
+        navController.navigate(NavigationRoute.RegistrationScreen.route){
+            popUpTo(NavigationRoute.SplashScreen.route){
                 inclusive = true      //this line will destroy the splashscreen
             }
         }
 
-    }
+    }}
 }

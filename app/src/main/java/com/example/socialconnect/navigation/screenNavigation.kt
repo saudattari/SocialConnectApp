@@ -13,16 +13,16 @@ import com.example.socialconnect.screens.SplashScreen
 @Composable
 fun ScreenNavigation(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "SplashScreen") {
-        composable("SplashScreen") {
+        composable(NavigationRoute.SplashScreen.route) {
                 SplashScreen(navController)
         }
-        composable("LoginScreen") {
+        composable(NavigationRoute.LoginScreen.route) {
                 LogInScreen(navController)
         }
-        composable("SignupScreen") {
+        composable(NavigationRoute.SignupScreen.route) {
                 SignupScreen(navController)
         }
-        composable("RegistrationScreen") {
+        composable(NavigationRoute.RegistrationScreen.route) {
                 RegistrationScreen(navController)
         }
     }

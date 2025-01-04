@@ -135,7 +135,7 @@ fun LogInScreen(navHostController: NavHostController) {
                         text = "Signup", Modifier
                             .clickable {
                             // Navigate to the signup screen
-                                navHostController.navigate(NavigationRoute.SignupScreen)
+                                navHostController.navigate(NavigationRoute.SignupScreen.route)
                         },
                         color = clickColor
                     )
@@ -147,7 +147,7 @@ fun LogInScreen(navHostController: NavHostController) {
                 text = "Developed by\nSaud",
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(20.dp),
+                    .padding(0.dp, 0.dp, 0.dp, 18.dp),
                 textAlign = TextAlign.Center
             )
         }

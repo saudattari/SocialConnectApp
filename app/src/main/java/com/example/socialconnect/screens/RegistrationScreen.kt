@@ -103,7 +103,9 @@ fun RegistrationScreen(navHostController: NavHostController) {
             Spacer(modifier = Modifier.height(20.dp))
 //            Create an account button
             Button(
-                onClick = {},
+                onClick = {
+                    navHostController.navigate(NavigationRoute.SignupScreen.route)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
@@ -136,7 +138,7 @@ fun RegistrationScreen(navHostController: NavHostController) {
                     text = "Login",
                     color = Color(0xFF1F9EFF),
                     modifier = Modifier.clickable {
-                        navHostController.navigate(NavigationRoute.LoginScreen)
+                        navHostController.navigate(NavigationRoute.LoginScreen.route)
                     }
 
                 )
@@ -150,7 +152,7 @@ fun RegistrationScreen(navHostController: NavHostController) {
             fontSize = 16.sp,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(0.dp, 0.dp, 0.dp, 10.dp)
+                .padding(0.dp, 0.dp, 0.dp, 18.dp)
         )
 
     }
