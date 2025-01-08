@@ -159,7 +159,7 @@ fun SignupScreen(navHostController: NavHostController) {
                                             "Account created successfully",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                        navHostController.navigate(NavigationRoute.RegistrationScreen.route)
+                                        navHostController.navigate(NavigationRoute.MainScreen.route)
                                     } else {
                                         Toast.makeText(
                                             context,

@@ -1,11 +1,16 @@
 package com.example.socialconnect.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.example.socialconnect.screens.HomeScreen
 import com.example.socialconnect.screens.LogInScreen
+import com.example.socialconnect.screens.MainScreen
+import com.example.socialconnect.screens.ProfileScreen
 import com.example.socialconnect.screens.RegistrationScreen
+import com.example.socialconnect.screens.SettingsScreen
 import com.example.socialconnect.screens.SignupScreen
 import com.example.socialconnect.screens.SplashScreen
 
@@ -24,6 +29,18 @@ fun ScreenNavigation(navController: NavHostController) {
         }
         composable(NavigationRoute.RegistrationScreen.route) {
                 RegistrationScreen(navController)
+        }
+        composable(NavigationRoute.HomeScreen.route) {
+                HomeScreen(modifier = Modifier)
+        }
+        composable(NavigationRoute.ProfileScreen.route) {
+                ProfileScreen(modifier = Modifier)
+        }
+        composable(NavigationRoute.SettingsScreen.route) {
+                SettingsScreen(modifier = Modifier)
+        }
+        composable(NavigationRoute.MainScreen.route){
+            MainScreen()
         }
     }
 }

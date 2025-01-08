@@ -130,8 +130,8 @@ fun LogInScreen(navHostController: NavHostController) {
                                 password = password.value,
                                 onComplete={
                                     if(it){
-                                        Toast.makeText(context, "You have loggined successfully",Toast.LENGTH_SHORT).show()
-                                        navHostController.navigate(NavigationRoute.RegistrationScreen.route)
+                                        Toast.makeText(context, "Logged In Successfully",Toast.LENGTH_SHORT).show()
+                                        navHostController.navigate(NavigationRoute.MainScreen.route)
                                     }
                                     else{
                                         Toast.makeText(context, "Error while logging in",Toast.LENGTH_SHORT).show()
