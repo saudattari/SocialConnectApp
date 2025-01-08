@@ -39,6 +39,7 @@ import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import kotlinx.coroutines.launch
 import java.security.SecureRandom
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun RegistrationScreen(navHostController: NavHostController) {
     val context = LocalContext.current as MainActivity

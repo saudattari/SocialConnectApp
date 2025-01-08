@@ -1,5 +1,7 @@
 package com.example.socialconnect.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -15,6 +17,7 @@ import com.example.socialconnect.screens.SignupScreen
 import com.example.socialconnect.screens.SplashScreen
 
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun ScreenNavigation(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "SplashScreen") {
