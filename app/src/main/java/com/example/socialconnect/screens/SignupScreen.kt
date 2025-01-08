@@ -1,6 +1,8 @@
 package com.example.socialconnect.screens
 
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -46,6 +49,7 @@ import com.example.socialconnect.dataModel.Data
 import com.example.socialconnect.navigation.NavigationRoute
 import com.example.socialconnect.ui.theme.clickColor
 import com.example.socialconnect.ui.theme.focusColor
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 
@@ -54,11 +58,8 @@ fun SignupScreen(navHostController: NavHostController) {
     val name = rememberSaveable { mutableStateOf("") }
     val email = rememberSaveable { mutableStateOf("") }
     val password = rememberSaveable { mutableStateOf("") }
-    val db = FirebaseFirestore.getInstance()
-    val collect = db.collection("Users")
-    val list =  remember {
-        mutableStateListOf<Data>()
-    }
+    val context = LocalContext.current
+
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier
@@ -145,7 +146,37 @@ fun SignupScreen(navHostController: NavHostController) {
                 )
                 Spacer(Modifier.height(10.dp))
                 Button(
-                    onClick = {},
+                    onClick = {
+                        if (name.value.isNotEmpty() && email.value.isNotEmpty() && password.value.isNotEmpty()) {
+                            createUserWithEmailAndPassword(
+                                context,
+                                email = email.value,
+                                password = password.value,
+                                onComplete = {
+                                    if (it) {
+                                        Toast.makeText(
+                                            context,
+                                            "Account created successfully",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        navHostController.navigate(NavigationRoute.RegistrationScreen.route)
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "Error! while creating account",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                            )
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Please fill all the fields",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = clickColor,
                     )
@@ -177,6 +208,24 @@ fun SignupScreen(navHostController: NavHostController) {
                     .padding(0.dp, 0.dp, 0.dp, 18.dp),
                 textAlign = TextAlign.Center
             )
+        }
+    }
+}
+
+fun createUserWithEmailAndPassword(
+    context: Context,
+    email: String,
+    password: String,
+    onComplete: (Boolean) -> Unit
+) {
+    val firebaseAuth = FirebaseAuth.getInstance()
+    firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener{
+        if(it.isSuccessful){
+            onComplete(true)
+        }
+        else{
+            Toast.makeText(context, "Error: ${it.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
+            onComplete(false)
         }
     }
 }

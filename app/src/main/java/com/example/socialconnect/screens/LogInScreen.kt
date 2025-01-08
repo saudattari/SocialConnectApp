@@ -1,5 +1,7 @@
 package com.example.socialconnect.screens
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -39,11 +42,13 @@ import com.example.socialconnect.R
 import com.example.socialconnect.navigation.NavigationRoute
 import com.example.socialconnect.ui.theme.clickColor
 import com.example.socialconnect.ui.theme.focusColor
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun LogInScreen(navHostController: NavHostController) {
     val email = rememberSaveable { mutableStateOf("") }
     val password = rememberSaveable { mutableStateOf("") }
+    val context = LocalContext.current
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier
@@ -117,7 +122,27 @@ fun LogInScreen(navHostController: NavHostController) {
                 )
                 Spacer(Modifier.height(10.dp))
                 Button(
-                    onClick = {},
+                    onClick = {
+                        if(email.value.isNotEmpty() && password.value.isNotEmpty()){
+                            signInWithEmailAndPassword(
+                                context = context,
+                                email = email.value,
+                                password = password.value,
+                                onComplete={
+                                    if(it){
+                                        Toast.makeText(context, "You have loggined successfully",Toast.LENGTH_SHORT).show()
+                                        navHostController.navigate(NavigationRoute.RegistrationScreen.route)
+                                    }
+                                    else{
+                                        Toast.makeText(context, "Error while logging in",Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            )
+                        }
+                        else{
+                            Toast.makeText(context  , "Please fill all fields", Toast.LENGTH_SHORT).show()
+                        }
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = clickColor,
                     )
@@ -150,6 +175,25 @@ fun LogInScreen(navHostController: NavHostController) {
                     .padding(0.dp, 0.dp, 0.dp, 18.dp),
                 textAlign = TextAlign.Center
             )
+        }
+    }
+}
+
+fun signInWithEmailAndPassword(
+    context: Context,
+    email: String,
+    password: String,
+    onComplete: (Boolean) -> Unit
+) {
+        val db = FirebaseAuth.getInstance()
+    db.signInWithEmailAndPassword(email , password).addOnCompleteListener{
+        if(it.isSuccessful){
+            Toast.makeText(context, "Logged in", Toast.LENGTH_SHORT).show()
+            onComplete(true)
+        }
+        else{
+            Toast.makeText(context, "Logging ${it.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
+            onComplete(false)
         }
     }
 }
