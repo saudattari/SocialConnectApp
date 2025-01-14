@@ -75,10 +75,9 @@ fun SplashScreen(navController: NavHostController) {
 
     LaunchedEffect(Unit) {
         delay(2000)
-        // Navigate to the next screen after the delay
         navController.navigate(NavigationRoute.RegistrationScreen.route){
             popUpTo(NavigationRoute.SplashScreen.route){
-                inclusive = true      //this line will destroy the splashscreen
+                inclusive = true
             }
         }
 

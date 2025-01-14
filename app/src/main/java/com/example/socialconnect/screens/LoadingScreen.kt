@@ -19,7 +19,6 @@ fun LoadingScreen() {
 
     val isLoading = remember { mutableStateOf(false) }
     if (isLoading.value) {
-        TODO()
     } else {
         Box(modifier = Modifier.fillMaxSize()) {
             CircularProgressIndicator(modifier = Modifier

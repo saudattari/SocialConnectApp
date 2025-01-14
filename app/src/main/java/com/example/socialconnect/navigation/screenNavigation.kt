@@ -17,10 +17,9 @@ import com.example.socialconnect.screens.SignupScreen
 import com.example.socialconnect.screens.SplashScreen
 
 
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun ScreenNavigation(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "SplashScreen") {
+    NavHost(navController = navController, startDestination = NavigationRoute.SplashScreen.route) {
         composable(NavigationRoute.SplashScreen.route) {
                 SplashScreen(navController)
         }
@@ -32,15 +31,6 @@ fun ScreenNavigation(navController: NavHostController) {
         }
         composable(NavigationRoute.RegistrationScreen.route) {
                 RegistrationScreen(navController)
-        }
-        composable(NavigationRoute.HomeScreen.route) {
-                HomeScreen(modifier = Modifier)
-        }
-        composable(NavigationRoute.ProfileScreen.route) {
-                ProfileScreen(modifier = Modifier)
-        }
-        composable(NavigationRoute.SettingsScreen.route) {
-                SettingsScreen(modifier = Modifier)
         }
         composable(NavigationRoute.MainScreen.route){
             MainScreen()

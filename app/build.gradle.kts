@@ -79,10 +79,12 @@ dependencies {
     // Also add the dependency for the Google Play services library and specify its version
     // add the following first party dependency
     val nav_version = "2.8.5"
-
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation ("androidx.credentials:credentials:1.3.0")
     implementation ("com.google.android.gms:play-services-auth:21.3.0") // Latest version
+    implementation ("androidx.compose.material:material-icons-core:1.7.6")
+    implementation ("androidx.compose.material:material-icons-extended-android:1.7.6")
+
 
 
 }

@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.socialconnect.CoilImage
 import com.example.socialconnect.R
-import com.example.socialconnect.dataModel.Data
 import com.example.socialconnect.navigation.NavigationRoute
 import com.example.socialconnect.ui.theme.clickColor
 import com.example.socialconnect.ui.theme.focusColor

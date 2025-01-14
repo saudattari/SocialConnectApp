@@ -4,6 +4,5 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 data class NavigationData(
     val icon: ImageVector,
-    val title: String,
-    val badgeCount: Int? = null
+    val title: String
 )
