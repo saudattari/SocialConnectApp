@@ -1,6 +1,7 @@
 package com.example.socialconnect.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -54,18 +55,19 @@ fun MainScreen() {
 
     ) { innerPadding ->
         ContentDisplay(
+            modifier = Modifier.padding(innerPadding),
             navigationSelectedIndex = clickIndex
         )
     }
 }
 
 @Composable
-fun ContentDisplay(navigationSelectedIndex: Int) {
+fun ContentDisplay(modifier: Modifier,navigationSelectedIndex: Int) {
     when (navigationSelectedIndex) {
         0 -> HomeScreen()
-        1 -> AddPostScreen()
-        2 -> SettingsScreen()
-        3 -> ProfileScreen()
+        2 -> AddPostScreen()
+        3 -> SettingsScreen()
+        4 -> ProfileScreen()
         else -> HomeScreen()
     }
 }
