@@ -4,9 +4,14 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,17 +23,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.PersonAddAlt1
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +62,7 @@ import com.example.socialconnect.dataModel.PostData
 
 @Composable
 fun ProfileScreen() {
+    val scroll = rememberScrollState()
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier
@@ -117,8 +129,7 @@ fun ProfileScreen() {
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Absolute.Center
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
                         onClick = {},
@@ -149,12 +160,6 @@ fun ProfileScreen() {
                             text = "Log Out", color = Color.Black
                         )
                     }
-                    Spacer(
-                        modifier = Modifier
-                            .height(1.dp)
-                            .background(Color.LightGray)
-                            .padding(vertical = 10.dp)
-                    )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
 //                horizontal Row
@@ -182,6 +187,13 @@ fun ProfileScreen() {
                         .padding(horizontal = 12.dp)
                         .background(Color.LightGray)
                 ) {}
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(scroll)
+                ) {
+                    PostsLazyCol()
+                }
             }
         }
     }
@@ -202,8 +214,7 @@ fun PostItemsDesign(listOfPost: PostData) {
                 .padding(12.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(listOfPost.profileImage),
@@ -212,9 +223,7 @@ fun PostItemsDesign(listOfPost: PostData) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = listOfPost.userName,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    text = listOfPost.userName, fontWeight = FontWeight.Bold, fontSize = 16.sp
                 )
                 Text(
                     text = listOfPost.timeAgo,
@@ -224,8 +233,7 @@ fun PostItemsDesign(listOfPost: PostData) {
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(
-                    imageVector = Icons.Default.MoreHoriz,
-                    contentDescription = "More Options"
+                    imageVector = Icons.Default.MoreHoriz, contentDescription = "More Options"
                 )
             }
 
@@ -247,6 +255,48 @@ fun PostItemsDesign(listOfPost: PostData) {
                         .clip(RoundedCornerShape(8.dp))
                 )
             }
+            Spacer(modifier = Modifier.height(8.dp))
+//            Action button like, comment
+            Row(
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                IconButton(onClick = { }) {
+                    Icon(imageVector = Icons.Default.FavoriteBorder, contentDescription = "Like")
+                }
+                IconButton(onClick = { }) {
+                    Icon(
+                        imageVector = Icons.Default.ChatBubbleOutline,
+                        contentDescription = "Comment"
+                    )
+                }
+                IconButton(onClick = { }) {
+                    Icon(imageVector = Icons.Default.Share, contentDescription = "Share")
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PostsLazyCol() {
+    val postList = listOf(
+        PostData(
+            userName = "mohammadsaud_attari",
+            timeAgo = "3h",
+            profileImage = R.drawable.photo,
+            postContent = "I'm Saud and I am an Android Developer.",
+            postImage = R.drawable.logo
+        ), PostData(
+            userName = "john_doe",
+            timeAgo = "5h",
+            profileImage = R.drawable.ic_launcher_background,
+            postContent = "Excited to share my new blog post!",
+        )
+    )
+    LazyColumn(contentPadding = PaddingValues(12.dp)) {
+        items(postList) { post ->
+            PostItemsDesign(post)
         }
     }
 }
