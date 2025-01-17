@@ -27,11 +27,13 @@ import androidx.navigation.NavHostController
 import com.example.socialconnect.CoilImage
 import com.example.socialconnect.R
 import com.example.socialconnect.navigation.NavigationRoute
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
 //@Preview
 @Composable
 fun SplashScreen(navController: NavHostController) {
+    var auth = FirebaseAuth.getInstance()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -64,7 +66,7 @@ fun SplashScreen(navController: NavHostController) {
         ) {
             Text(
                 text = "Develop by\nSaud",
-                modifier = Modifier.padding(0.dp,0.dp,0.dp,28.dp),
+                modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 28.dp),
                 color = Color.White, fontSize = 18.sp,
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Bold,
@@ -73,13 +75,21 @@ fun SplashScreen(navController: NavHostController) {
         }
 
 
-    LaunchedEffect(Unit) {
-        delay(2000)
-        navController.navigate(NavigationRoute.RegistrationScreen.route){
-            popUpTo(NavigationRoute.SplashScreen.route){
-                inclusive = true
+        LaunchedEffect(Unit) {
+            delay(2000)
+            if (auth.currentUser != null) {
+                navController.navigate(NavigationRoute.MainScreen.route) {
+                    popUpTo(NavigationRoute.SplashScreen.route) {
+                        inclusive = true
+                    }
+                }
+            } else {
+                navController.navigate(NavigationRoute.RegistrationScreen.route) {
+                    popUpTo(NavigationRoute.SplashScreen.route) {
+                        inclusive = true
+                    }
+                }
             }
         }
-
-    }}
+    }
 }

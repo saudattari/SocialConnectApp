@@ -123,24 +123,38 @@ fun LogInScreen(navHostController: NavHostController) {
                 Spacer(Modifier.height(10.dp))
                 Button(
                     onClick = {
-                        if(email.value.isNotEmpty() && password.value.isNotEmpty()){
+                        if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
                             signInWithEmailAndPassword(
                                 context = context,
                                 email = email.value,
                                 password = password.value,
-                                onComplete={
-                                    if(it){
-                                        Toast.makeText(context, "Logged In Successfully",Toast.LENGTH_SHORT).show()
-                                        navHostController.navigate(NavigationRoute.MainScreen.route)
-                                    }
-                                    else{
-                                        Toast.makeText(context, "Error while logging in",Toast.LENGTH_SHORT).show()
+                                onComplete = {
+                                    if (it) {
+                                        Toast.makeText(
+                                            context,
+                                            "Logged In Successfully",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        navHostController.navigate(NavigationRoute.MainScreen.route) {
+                                            popUpTo(NavigationRoute.LoginScreen.route) {
+                                                inclusive = true
+                                            }
+                                            popUpTo(NavigationRoute.RegistrationScreen.route) {
+                                                inclusive = true
+                                            }
+                                        }
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "Error while logging in",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 }
                             )
-                        }
-                        else{
-                            Toast.makeText(context  , "Please fill all fields", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT)
+                                .show()
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
@@ -159,9 +173,9 @@ fun LogInScreen(navHostController: NavHostController) {
                     Text(
                         text = "Signup", Modifier
                             .clickable {
-                            // Navigate to the signup screen
+                                // Navigate to the signup screen
                                 navHostController.navigate(NavigationRoute.SignupScreen.route)
-                        },
+                            },
                         color = clickColor
                     )
                 }
@@ -185,14 +199,14 @@ fun signInWithEmailAndPassword(
     password: String,
     onComplete: (Boolean) -> Unit
 ) {
-        val db = FirebaseAuth.getInstance()
-    db.signInWithEmailAndPassword(email , password).addOnCompleteListener{
-        if(it.isSuccessful){
+    val db = FirebaseAuth.getInstance()
+    db.signInWithEmailAndPassword(email, password).addOnCompleteListener {
+        if (it.isSuccessful) {
             Toast.makeText(context, "Logged in", Toast.LENGTH_SHORT).show()
             onComplete(true)
-        }
-        else{
-            Toast.makeText(context, "Logging ${it.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Logging ${it.exception?.localizedMessage}", Toast.LENGTH_SHORT)
+                .show()
             onComplete(false)
         }
     }

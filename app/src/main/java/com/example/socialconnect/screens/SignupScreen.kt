@@ -158,7 +158,17 @@ fun SignupScreen(navHostController: NavHostController) {
                                             "Account created successfully",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                        navHostController.navigate(NavigationRoute.MainScreen.route)
+                                        navHostController.navigate(NavigationRoute.MainScreen.route) {
+                                            popUpTo(NavigationRoute.SignupScreen.route) {
+                                                inclusive = true
+                                            }
+                                            popUpTo(NavigationRoute.LoginScreen.route) {
+                                                inclusive = true
+                                            }
+                                            popUpTo(NavigationRoute.RegistrationScreen.route) {
+                                                inclusive = true
+                                            }
+                                        }
                                     } else {
                                         Toast.makeText(
                                             context,
@@ -218,12 +228,12 @@ fun createUserWithEmailAndPassword(
     onComplete: (Boolean) -> Unit
 ) {
     val firebaseAuth = FirebaseAuth.getInstance()
-    firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener{
-        if(it.isSuccessful){
+    firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
+        if (it.isSuccessful) {
             onComplete(true)
-        }
-        else{
-            Toast.makeText(context, "Error: ${it.exception?.localizedMessage}", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Error: ${it.exception?.localizedMessage}", Toast.LENGTH_SHORT)
+                .show()
             onComplete(false)
         }
     }

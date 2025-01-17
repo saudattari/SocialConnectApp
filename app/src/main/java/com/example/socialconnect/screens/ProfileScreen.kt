@@ -4,10 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.ScrollableState
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -60,9 +55,9 @@ import coil3.compose.rememberAsyncImagePainter
 import com.example.socialconnect.R
 import com.example.socialconnect.dataModel.PostData
 
+@Preview
 @Composable
 fun ProfileScreen() {
-    val scroll = rememberScrollState()
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier
@@ -124,8 +119,10 @@ fun ProfileScreen() {
                             .size(54.dp)
                             .background(shape = CircleShape, color = Color.LightGray)
                             .padding(12.dp)
-                            .clickable { },
-                    )
+                            .clickable {
+                            },
+
+                        )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
@@ -190,7 +187,6 @@ fun ProfileScreen() {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .verticalScroll(scroll)
                 ) {
                     PostsLazyCol()
                 }
@@ -204,8 +200,9 @@ fun PostItemsDesign(listOfPost: PostData) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
-        elevation = CardDefaults.cardElevation(3.dp),
+            .padding(vertical = 12.dp)
+            .background(Color.White),
+//        elevation = CardDefaults.cardElevation(3.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(
@@ -219,7 +216,9 @@ fun PostItemsDesign(listOfPost: PostData) {
                 Image(
                     painter = rememberAsyncImagePainter(listOfPost.profileImage),
                     contentDescription = "Profile Image",
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(100.dp))
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -277,7 +276,6 @@ fun PostItemsDesign(listOfPost: PostData) {
     }
 }
 
-@Preview
 @Composable
 fun PostsLazyCol() {
     val postList = listOf(
@@ -285,12 +283,12 @@ fun PostsLazyCol() {
             userName = "mohammadsaud_attari",
             timeAgo = "3h",
             profileImage = R.drawable.photo,
-            postContent = "I'm Saud and I am an Android Developer.",
-            postImage = R.drawable.logo
+            postContent = "I'm Saud and I am an Android Developer. This is my new App Logo",
+//            postImage = R.drawable.logo
         ), PostData(
-            userName = "john_doe",
+            userName = "hafiz_farhan",
             timeAgo = "5h",
-            profileImage = R.drawable.ic_launcher_background,
+            profileImage = R.drawable.farhan,
             postContent = "Excited to share my new blog post!",
         )
     )

@@ -84,6 +84,7 @@ dependencies {
     implementation ("com.google.android.gms:play-services-auth:21.3.0") // Latest version
     implementation ("androidx.compose.material:material-icons-core:1.7.6")
     implementation ("androidx.compose.material:material-icons-extended-android:1.7.6")
+    implementation("io.coil-kt.coil3:coil-compose:3")
 
 
 
