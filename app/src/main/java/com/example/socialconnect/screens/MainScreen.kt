@@ -30,16 +30,12 @@ fun MainScreen() {
                 NavigationItemsList.forEachIndexed { index, navigationData ->
                     NavigationBarItem(
                         selected = index == clickIndex,
-                        onClick = {
-                            clickIndex = index
-                        },
-                        icon = {
-                            Icon(
-                                navigationData.icon,
-                                contentDescription = navigationData.title,
-                                modifier = Modifier.size(30.dp)
-                            )
-                        }, colors = NavigationBarItemColors(
+
+                        onClick = { clickIndex = index },
+
+                        icon = { Icon(navigationData.icon, contentDescription = navigationData.title, modifier = Modifier.size(20.dp)) },
+
+                        colors = NavigationBarItemColors(
                             selectedIconColor = Color.Black,
                             selectedTextColor = Color.Unspecified,
                             selectedIndicatorColor = focusColor,
@@ -47,7 +43,7 @@ fun MainScreen() {
                             unselectedTextColor = Color.Unspecified,
                             disabledIconColor = Color.Unspecified,
                             disabledTextColor = Color.Unspecified
-                        ), alwaysShowLabel = false
+                        ),
                     )
                 }
             }

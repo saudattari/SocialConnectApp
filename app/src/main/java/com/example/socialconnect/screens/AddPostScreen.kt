@@ -1,10 +1,19 @@
 package com.example.socialconnect.screens
 
-import android.widget.Toast
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 
+@Preview
 @Composable
 fun AddPostScreen() {
-    Toast.makeText(LocalContext.current, "Add Post Screen", Toast.LENGTH_SHORT).show()
+    Scaffold {innerPadding->
+        Box(modifier = Modifier.padding(innerPadding)) {
+
+        }
+
+    }
 }

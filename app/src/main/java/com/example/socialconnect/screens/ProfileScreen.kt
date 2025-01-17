@@ -77,7 +77,12 @@ fun ProfileScreen() {
                         fontSize = 20.sp,
                         fontFamily = FontFamily(Font(R.font.roboto_regular))
                     )
-                    Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Settings",
+                        modifier = Modifier.clickable {
+
+                        })
                 }
                 Row(
                     modifier = Modifier
@@ -176,14 +181,6 @@ fun ProfileScreen() {
                     fontFamily = FontFamily(Font(R.font.roboto_bold)),
                     textDecoration = TextDecoration.Underline
                 )
-//                horizontal Row
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .padding(horizontal = 12.dp)
-                        .background(Color.LightGray)
-                ) {}
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
