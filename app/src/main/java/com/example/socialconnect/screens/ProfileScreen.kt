@@ -199,7 +199,8 @@ fun PostItemsDesign(listOfPost: PostData) {
             .fillMaxWidth()
             .padding(vertical = 12.dp)
             .background(Color.White),
-//        elevation = CardDefaults.cardElevation(3.dp),
+        colors =CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(3.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(
@@ -247,11 +248,12 @@ fun PostItemsDesign(listOfPost: PostData) {
                     contentDescription = "Post Image",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(200.dp)
+                        .heightIn(80.dp)
                         .clip(RoundedCornerShape(8.dp))
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
+            Row(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color.LightGray)) {  }
 //            Action button like, comment
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
@@ -280,8 +282,8 @@ fun PostsLazyCol() {
             userName = "mohammadsaud_attari",
             timeAgo = "3h",
             profileImage = R.drawable.photo,
-            postContent = "I'm Saud and I am an Android Developer. This is my new App Logo",
-            postImage = R.drawable.logo
+            postContent = "I'm Saud and I am an Android Developer.",
+            postImage = R.drawable.photo
         ), PostData(
             userName = "hafiz_farhan",
             timeAgo = "5h",
