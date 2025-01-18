@@ -158,9 +158,7 @@ fun FeedItemsDesign(listOfPost: PostData) {
                     modifier = Modifier.padding(horizontal = 6.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    imageVector = Icons.Default.MoreHoriz, contentDescription = "More Options"
-                )
+                IconButton(onClick = {}){ Icon(imageVector = Icons.Default.MoreHoriz, contentDescription = "More Options") }
             }
 
             Spacer(modifier = Modifier.height(8.dp))

@@ -34,11 +34,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,138 +61,147 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.rememberAsyncImagePainter
 import com.example.socialconnect.R
 import com.example.socialconnect.dataModel.PostData
+import kotlinx.coroutines.launch
 
 @Preview
 @Composable
 fun ProfileScreen() {
-    Scaffold { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Profile Screen",
-                        modifier = Modifier,
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto_regular))
-                    )
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = "Settings",
-                        modifier = Modifier.clickable {
+    val isDrawerOpen by remember {  mutableStateOf(false)}
+    val scope = rememberCoroutineScope()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-                        })
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(Color.LightGray)
-                ) { }
-                Spacer(modifier = Modifier.height(20.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp, 0.dp, 12.dp, 0.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(modifier = Modifier) {
+    ModalNavigationDrawer(drawerContent = { }, drawerState = drawerState) {
+        Scaffold { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            ) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Text(
-                            text = "Mohammad Saud",
+                            text = "Profile Screen",
                             modifier = Modifier,
-                            fontSize = 25.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto_bold))
+                            fontSize = 20.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto_regular))
                         )
-                        Text(
-                            text = "mohammadsaud_attari",
-                            fontSize = 17.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                            modifier = Modifier.padding(0.dp, 7.dp, 0.dp, 0.dp)
-                        )
-                        Text(
-                            text = "100 follower",
-                            fontSize = 15.sp,
-                            modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp),
-                            color = Color.Gray
-                        )
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Settings",
+                            modifier = Modifier.clickable {
+                                scope.launch {
+//                                    isDrawerOpen = true
+                                }
+                            })
                     }
-                    Icon(
-                        imageVector = Icons.Default.PersonAddAlt1,
-                        contentDescription = "Add profile Image",
+                    Row(
                         modifier = Modifier
-                            .size(54.dp)
-                            .background(shape = CircleShape, color = Color.LightGray)
-                            .padding(12.dp)
-                            .clickable {
-                            },
-
-                        )
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(
-                        onClick = {},
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(Color.LightGray)
+                    ) { }
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Row(
                         modifier = Modifier
-                            .padding(horizontal = 10.dp)
-                            .width(120.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(),
-                        border = BorderStroke(
-                            width = 1.dp, brush = Brush.linearGradient(
-                                listOf(Color.Gray, Color.Gray)
+                            .fillMaxWidth()
+                            .padding(12.dp, 0.dp, 12.dp, 0.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier) {
+                            Text(
+                                text = "Mohammad Saud",
+                                modifier = Modifier,
+                                fontSize = 25.sp,
+                                fontFamily = FontFamily(Font(R.font.roboto_bold))
                             )
-                        )
-                    ) {
-                        Text(text = "Edit Profile", color = Color.Black)
+                            Text(
+                                text = "mohammadsaud_attari",
+                                fontSize = 17.sp,
+                                fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                                modifier = Modifier.padding(0.dp, 7.dp, 0.dp, 0.dp)
+                            )
+                            Text(
+                                text = "100 follower",
+                                fontSize = 15.sp,
+                                modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp),
+                                color = Color.Gray
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.Default.PersonAddAlt1,
+                            contentDescription = "Add profile Image",
+                            modifier = Modifier
+                                .size(54.dp)
+                                .background(shape = CircleShape, color = Color.LightGray)
+                                .padding(12.dp)
+                                .clickable {
+                                },
+
+                            )
                     }
-                    Button(
-                        onClick = {},
-                        modifier = Modifier
-                            .padding(horizontal = 10.dp)
-                            .width(120.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(),
-                        border = BorderStroke(
-                            width = 1.dp,
-                            brush = Brush.linearGradient(listOf(Color.Gray, Color.Gray))
-                        )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                     ) {
-                        Text(
-                            text = "Log Out", color = Color.Black
-                        )
+                        Button(
+                            onClick = {},
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp)
+                                .width(120.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(),
+                            border = BorderStroke(
+                                width = 1.dp, brush = Brush.linearGradient(
+                                    listOf(Color.Gray, Color.Gray)
+                                )
+                            )
+                        ) {
+                            Text(text = "Edit Profile", color = Color.Black)
+                        }
+                        Button(
+                            onClick = {},
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp)
+                                .width(120.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(),
+                            border = BorderStroke(
+                                width = 1.dp,
+                                brush = Brush.linearGradient(listOf(Color.Gray, Color.Gray))
+                            )
+                        ) {
+                            Text(
+                                text = "Log Out", color = Color.Black
+                            )
+                        }
                     }
-                }
-                Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 //                horizontal Row
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(Color.LightGray)
-                        .padding(horizontal = 12.dp)
-                ) {}
-                Text(
-                    text = "Posts",
-                    modifier = Modifier
-                        .padding(12.dp, 10.dp, 0.dp, 0.dp)
-                        .fillMaxWidth(),
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily(Font(R.font.roboto_bold)),
-                    textDecoration = TextDecoration.Underline
-                )
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    PostsLazyCol()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(Color.LightGray)
+                            .padding(horizontal = 12.dp)
+                    ) {}
+                    Text(
+                        text = "Posts",
+                        modifier = Modifier
+                            .padding(12.dp, 10.dp, 0.dp, 0.dp)
+                            .fillMaxWidth(),
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto_bold)),
+                        textDecoration = TextDecoration.Underline
+                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        PostsLazyCol()
+                    }
                 }
             }
         }
@@ -229,9 +245,7 @@ fun PostItemsDesign(listOfPost: PostData) {
                     modifier = Modifier.padding(horizontal = 6.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    imageVector = Icons.Default.MoreHoriz, contentDescription = "More Options"
-                )
+                IconButton(onClick = {}){ Icon(imageVector = Icons.Default.MoreHoriz, contentDescription = "More Options") }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
