@@ -281,7 +281,7 @@ fun PostsLazyCol() {
             timeAgo = "3h",
             profileImage = R.drawable.photo,
             postContent = "I'm Saud and I am an Android Developer. This is my new App Logo",
-//            postImage = R.drawable.logo
+            postImage = R.drawable.logo
         ), PostData(
             userName = "hafiz_farhan",
             timeAgo = "5h",
