@@ -30,6 +30,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,7 +51,7 @@ import com.google.firebase.firestore.firestore
 @Preview
 @Composable
 fun AddPostScreen() {
-//    val db = Firebase.firestore
+    var postText by remember { mutableStateOf("") }
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {},Modifier.clip(RoundedCornerShape(50.dp)), containerColor = clickColor, contentColor = Color.White) {
@@ -107,9 +111,9 @@ fun AddPostScreen() {
 
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
+                        value = postText,
                         placeholder = { Text(text = "What's New") },
-                        value = "",
-                        onValueChange = {},
+                        onValueChange = {postText = it},
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(200.dp),
