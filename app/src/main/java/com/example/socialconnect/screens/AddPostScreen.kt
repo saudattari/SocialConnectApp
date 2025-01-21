@@ -1,5 +1,6 @@
 package com.example.socialconnect.screens
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,16 +41,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.socialconnect.R
 import com.example.socialconnect.ui.theme.clickColor
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 
 @Preview
 @Composable
 fun AddPostScreen() {
+//    val db = Firebase.firestore
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {},Modifier.clip(RoundedCornerShape(50.dp)), containerColor = clickColor, contentColor = Color.White) {
                 Icon(imageVector = Icons.Default.Check, contentDescription = "Add Post")
             }
         }
+
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -99,6 +104,7 @@ fun AddPostScreen() {
                             text = "mohammadsaud_attari", fontWeight = FontWeight.Bold, fontSize = 16.sp
                         )
                     }
+
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         placeholder = { Text(text = "What's New") },
@@ -125,6 +131,5 @@ fun AddPostScreen() {
                 }
             }
         }
-
     }
 }

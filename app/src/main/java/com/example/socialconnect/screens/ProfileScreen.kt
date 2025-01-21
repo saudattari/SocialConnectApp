@@ -101,33 +101,35 @@ fun ProfileScreen() {
                         Text(
                             text = "Mohammad Saud",
                             modifier = Modifier,
-                            fontSize = 25.sp,
+                            fontSize = 22.sp,
                             fontFamily = FontFamily(Font(R.font.roboto_bold))
                         )
                         Text(
                             text = "mohammadsaud_attari",
-                            fontSize = 17.sp,
+                            fontSize = 15.sp,
                             fontFamily = FontFamily(Font(R.font.roboto_regular)),
                             modifier = Modifier.padding(0.dp, 7.dp, 0.dp, 0.dp)
                         )
                         Text(
                             text = "100 follower",
-                            fontSize = 15.sp,
+                            fontSize = 13.sp,
                             modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp),
                             color = Color.Gray
                         )
                     }
-                    Icon(
-                        imageVector = Icons.Default.PersonAddAlt1,
-                        contentDescription = "Add profile Image",
-                        modifier = Modifier
-                            .size(54.dp)
-                            .background(shape = CircleShape, color = Color.LightGray)
-                            .padding(12.dp)
-                            .clickable {
-                            },
+                    IconButton(
+                        onClick = {
 
-                        )
+                        },
+                        modifier = Modifier
+                            .background(shape = CircleShape, color = Color.LightGray)
+                            .padding(5.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PersonAddAlt1,
+                            contentDescription = "Add profile Image",
+                            modifier = Modifier.size(35.dp))
+                    }
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
@@ -183,7 +185,7 @@ fun ProfileScreen() {
                 )
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth().padding(bottom = 65.dp)
                 ) {
                     PostsLazyCol()
                 }
@@ -253,7 +255,10 @@ fun PostItemsDesign(listOfPost: PostData) {
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Row(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color.LightGray)) {  }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(Color.LightGray)) {  }
 //            Action button like, comment
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
@@ -291,7 +296,7 @@ fun PostsLazyCol() {
             postContent = "Excited to share my new blog post!",
         )
     )
-    LazyColumn(contentPadding = PaddingValues(12.dp)) {
+    LazyColumn() {
         items(postList) { post ->
             PostItemsDesign(post)
         }
