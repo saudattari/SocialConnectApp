@@ -163,8 +163,7 @@ fun SignupScreen(navHostController: NavHostController) {
                                             "email" to email.value,
                                             "password" to password.value,
                                             "profilePicture" to "",
-                                            "createdAt" to System.currentTimeMillis(),
-                                            b
+                                            "createdAt" to System.currentTimeMillis()
                                         )
                                         userId?.let { id ->
                                             db.collection("users")
