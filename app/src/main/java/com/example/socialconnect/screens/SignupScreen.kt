@@ -48,8 +48,10 @@ import com.example.socialconnect.R
 import com.example.socialconnect.navigation.NavigationRoute
 import com.example.socialconnect.ui.theme.clickColor
 import com.example.socialconnect.ui.theme.focusColor
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 
 
 @Composable
@@ -58,6 +60,8 @@ fun SignupScreen(navHostController: NavHostController) {
     val email = rememberSaveable { mutableStateOf("") }
     val password = rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current
+    val db = Firebase.firestore
+    val auth = FirebaseAuth.getInstance()
 
     Scaffold { innerPadding ->
         Box(
@@ -153,21 +157,35 @@ fun SignupScreen(navHostController: NavHostController) {
                                 password = password.value,
                                 onComplete = {
                                     if (it) {
-                                        Toast.makeText(
-                                            context,
-                                            "Account created successfully",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        navHostController.navigate(NavigationRoute.MainScreen.route) {
-                                            popUpTo(NavigationRoute.SignupScreen.route) {
-                                                inclusive = true
-                                            }
-                                            popUpTo(NavigationRoute.LoginScreen.route) {
-                                                inclusive = true
-                                            }
-                                            popUpTo(NavigationRoute.RegistrationScreen.route) {
-                                                inclusive = true
-                                            }
+                                        val userId = auth.currentUser?.uid
+                                        val user = hashMapOf(
+                                            "name" to name.value,
+                                            "email" to email.value,
+                                            "password" to password.value,
+                                            "profilePicture" to "",
+                                            "createdAt" to System.currentTimeMillis()
+                                        )
+                                        userId?.let { id ->
+                                            db.collection("users")
+                                                .document(id)
+                                                .set(user)
+                                                .addOnSuccessListener {
+                                                    Toast.makeText(context, "Account created successfully", Toast.LENGTH_SHORT).show()
+                                                    navHostController.navigate(NavigationRoute.MainScreen.route) {
+                                                        popUpTo(NavigationRoute.SignupScreen.route) {
+                                                            inclusive = true
+                                                        }
+                                                        popUpTo(NavigationRoute.LoginScreen.route) {
+                                                            inclusive = true
+                                                        }
+                                                        popUpTo(NavigationRoute.RegistrationScreen.route) {
+                                                            inclusive = true
+                                                        }
+                                                    }
+                                                }
+                                                .addOnFailureListener {
+                                                    Toast.makeText(context, "Account not created", Toast.LENGTH_SHORT).show()
+                                                }
                                         }
                                     } else {
                                         Toast.makeText(

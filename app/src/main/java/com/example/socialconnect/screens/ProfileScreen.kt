@@ -87,8 +87,25 @@ fun ProfileScreen() {
                         Text(
                             text = "Profile Screen",
                             modifier = Modifier,
+<<<<<<< HEAD
                             fontSize = 20.sp,
                             fontFamily = FontFamily(Font(R.font.roboto_regular))
+=======
+                            fontSize = 22.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto_bold))
+                        )
+                        Text(
+                            text = "mohammadsaud_attari",
+                            fontSize = 15.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto_regular)),
+                            modifier = Modifier.padding(0.dp, 7.dp, 0.dp, 0.dp)
+                        )
+                        Text(
+                            text = "100 follower",
+                            fontSize = 13.sp,
+                            modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp),
+                            color = Color.Gray
+>>>>>>> Firestore
                         )
                         Icon(
                             imageVector = Icons.Default.Settings,
@@ -99,6 +116,7 @@ fun ProfileScreen() {
                                 }
                             })
                     }
+<<<<<<< HEAD
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -107,6 +125,28 @@ fun ProfileScreen() {
                     ) { }
                     Spacer(modifier = Modifier.height(20.dp))
                     Row(
+=======
+                    IconButton(
+                        onClick = {
+
+                        },
+                        modifier = Modifier
+                            .background(shape = CircleShape, color = Color.LightGray)
+                            .padding(5.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PersonAddAlt1,
+                            contentDescription = "Add profile Image",
+                            modifier = Modifier.size(35.dp))
+                    }
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        onClick = {},
+>>>>>>> Firestore
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(12.dp, 0.dp, 12.dp, 0.dp),
@@ -180,6 +220,7 @@ fun ProfileScreen() {
                     }
                     Spacer(modifier = Modifier.height(12.dp))
 //                horizontal Row
+<<<<<<< HEAD
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -202,6 +243,29 @@ fun ProfileScreen() {
                     ) {
                         PostsLazyCol()
                     }
+=======
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Color.LightGray)
+                        .padding(horizontal = 12.dp)
+                ) {}
+                Text(
+                    text = "Posts",
+                    modifier = Modifier
+                        .padding(12.dp, 10.dp, 0.dp, 0.dp)
+                        .fillMaxWidth(),
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily(Font(R.font.roboto_bold)),
+                    textDecoration = TextDecoration.Underline
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth().padding(bottom = 65.dp)
+                ) {
+                    PostsLazyCol()
+>>>>>>> Firestore
                 }
             }
         }
@@ -267,7 +331,10 @@ fun PostItemsDesign(listOfPost: PostData) {
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Row(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color.LightGray)) {  }
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(Color.LightGray)) {  }
 //            Action button like, comment
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
@@ -305,7 +372,7 @@ fun PostsLazyCol() {
             postContent = "Excited to share my new blog post!",
         )
     )
-    LazyColumn(contentPadding = PaddingValues(12.dp)) {
+    LazyColumn() {
         items(postList) { post ->
             PostItemsDesign(post)
         }

@@ -30,10 +30,10 @@ import com.example.socialconnect.navigation.NavigationRoute
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
-//@Preview
+
 @Composable
 fun SplashScreen(navController: NavHostController) {
-    var auth = FirebaseAuth.getInstance()
+    val auth = FirebaseAuth.getInstance()
     Box(
         modifier = Modifier
             .fillMaxSize()
