@@ -38,6 +38,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -89,6 +90,11 @@ fun ProfileScreen() {
                     Toast.makeText(context, "Error: $error", Toast.LENGTH_SHORT).show()
                 }
             )
+        }
+    }
+    LaunchedEffect(userID) {
+        fetchFromFirestore(userID) { imageUrl ->
+            profileImageUrl = imageUrl
         }
     }
 
@@ -304,7 +310,7 @@ fun uploadImageToCloudinary(context: Context, fileUri: Uri, onSuccess: (String) 
 
             override fun onProgress(requestId: String?, bytes: Long, totalBytes: Long) {
                 val progress = (bytes.toDouble() / totalBytes) * 100
-                Toast.makeText(context, "Upload Progress $progress%", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Upload Progress ${progress.toInt()}%", Toast.LENGTH_SHORT).show()
             }
 
             override fun onSuccess(requestId: String?, resultData: MutableMap<Any?, Any?>?) {
@@ -333,7 +339,14 @@ fun uploadImageToFireStore(userId: String,imageURl: String, onSuccess: () -> Uni
         .addOnFailureListener { onError() }
 }
 
-
+fun fetchFromFirestore(userId: String, onSuccess: (String) -> Unit){
+    val db = FirebaseFirestore.getInstance()
+    val userDoc = db.collection("users").document(userId)
+    userDoc.get().addOnSuccessListener { documentSnapshot ->
+        val imageUrl = documentSnapshot.getString("profilePicture")
+        imageUrl?.let { onSuccess(it) }
+    }
+}
 
 
 

@@ -1,6 +1,11 @@
 package com.example.socialconnect.screens
 
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,20 +43,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cloudinary.android.MediaManager
+import com.cloudinary.android.callback.ErrorInfo
+import com.cloudinary.android.callback.UploadCallback
 import com.example.socialconnect.R
 import com.example.socialconnect.ui.theme.clickColor
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import kotlin.contracts.contract
 
 @Preview
 @Composable
 fun AddPostScreen() {
     var postText by remember { mutableStateOf("") }
+    val context  = LocalContext.current
+    val ImageUrlState by remember {  }
+    val imageLauncher = rememberLauncherForActivityResult(contract  = ActivityResultContracts.GetContent()) {uri: Uri?->
+        uri?.let {
+//            upload image to Cloudinary
+            uploadImageToCloudinary(
+                context =context,
+                fileUri = it,
+                onSuccess = {fileUri->
+
+                }
+            )
+        }
+    }
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {},Modifier.clip(RoundedCornerShape(50.dp)), containerColor = clickColor, contentColor = Color.White) {
@@ -122,12 +146,15 @@ fun AddPostScreen() {
 //                    add Action buttons
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth().padding(vertical = 3.dp)
+                            .fillMaxWidth()
+                            .padding(vertical = 3.dp)
                             .clip(RoundedCornerShape(10.dp))
                             .background(Color.LightGray),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                      IconButton(onClick = {}, modifier = Modifier,) { Icon(imageVector = Icons.Default.AddPhotoAlternate, contentDescription = "Add Image", tint = Color.Black) }
+                      IconButton(onClick = {
+                          imageLauncher.launch("image/* , video/*")
+                      }, modifier = Modifier,) { Icon(imageVector = Icons.Default.AddPhotoAlternate, contentDescription = "Add Image", tint = Color.Black) }
                       IconButton(onClick = {}) { Icon(imageVector = Icons.Default.CameraAlt, contentDescription = "Open Camera", tint = Color.Black) }
                       IconButton(onClick = {}) { Icon(imageVector = Icons.Default.Tag, contentDescription = "Add Hashtag", tint = Color.Black) }
                       IconButton(onClick = {}) { Icon(imageVector = Icons.Default.LocationOn, contentDescription = "Add Location", tint = Color.Black) }
@@ -136,4 +163,31 @@ fun AddPostScreen() {
             }
         }
     }
+}
+fun uploadImageToCloudinary(fileUri: Uri, onSuccess:(String) ->Unit, context:Context){
+    MediaManager.get().upload(fileUri).callback(object :  UploadCallback{
+        override fun onStart(requestId: String?) {
+            Toast.makeText(context, "Upload started", Toast.LENGTH_SHORT).show()
+
+        }
+
+        override fun onProgress(requestId: String?, bytes: Long, totalBytes: Long) {
+            val totalTime = (bytes.toDouble() / totalBytes) * 100
+            Toast.makeText(context, "Uploading started...${totalTime.toInt()}", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onSuccess(requestId: String?, resultData: MutableMap<Any?, Any?>?) {
+            val fileUri =resultData?.get("url") as String
+            Toast.makeText(context, "Uploading completed", Toast.LENGTH_SHORT).show()
+            onSuccess(fileUri)
+        }
+
+        override fun onError(requestId: String?, error: ErrorInfo?) {
+            Toast.makeText(context, "Uploading problem", Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onReschedule(requestId: String?, error: ErrorInfo?) {
+        }
+
+    })
 }
