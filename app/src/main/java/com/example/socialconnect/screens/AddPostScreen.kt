@@ -46,24 +46,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.data.EmptyGroup.data
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.rememberAsyncImagePainter
 import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
 import com.example.socialconnect.R
 import com.example.socialconnect.ui.theme.clickColor
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
+import okhttp3.internal.format
 import kotlin.contracts.contract
 
 @Preview
 @Composable
 fun AddPostScreen() {
     var postText by remember { mutableStateOf("") }
+    val listImages = mutableListOf(R.drawable.photo)
     val context  = LocalContext.current
-    val ImageUrlState by remember {  }
+    var imageUrlState by remember { mutableStateOf("") }
     val imageLauncher = rememberLauncherForActivityResult(contract  = ActivityResultContracts.GetContent()) {uri: Uri?->
         uri?.let {
 //            upload image to Cloudinary
@@ -71,7 +78,7 @@ fun AddPostScreen() {
                 context =context,
                 fileUri = it,
                 onSuccess = {fileUri->
-
+                    imageUrlState = fileUri
                 }
             )
         }
@@ -143,6 +150,20 @@ fun AddPostScreen() {
                             .height(200.dp),
                         maxLines = 10,
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if(listImages.isNotEmpty()){
+                        ForEach()
+                        listImages.forEach{ imageUrl->
+                            Row(modifier = Modifier
+                                .fillMaxWidth()
+                                .height(80.dp)) {
+                                Image(painter = , contentDescription = "PotContentPicture")
+                            }
+
+                        }
+                    }
+
 //                    add Action buttons
                     Row(
                         modifier = Modifier
@@ -191,3 +212,18 @@ fun uploadImageToCloudinary(fileUri: Uri, onSuccess:(String) ->Unit, context:Con
 
     })
 }
+ fun uploadContentToFireStore(context: Context,currentUser:String,content:String, imageUrl:String,onSuccess: () -> Unit){
+     val db = FirebaseFirestore.getInstance()
+     val postDocRef = db.collection("posts").document(currentUser)
+     val data  = hashMapOf(
+         "content" to content,
+         "ContentImage" to imageUrl,
+         "userId" to currentUser
+     )
+     postDocRef.set(data, SetOptions.merge()).addOnSuccessListener {
+         onSuccess()
+     }
+         .addOnFailureListener {
+             Toast.makeText(context, "Sorry! getting error while uploading post on FireStore", Toast.LENGTH_SHORT).show()
+         }
+ }
