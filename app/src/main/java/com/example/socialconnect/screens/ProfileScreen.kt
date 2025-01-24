@@ -1,13 +1,16 @@
 package com.example.socialconnect.screens
 
-import androidx.compose.foundation.BorderStroke
+import android.content.Context
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,10 +22,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -30,8 +31,6 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.PersonAddAlt1
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
@@ -42,30 +41,48 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+<<<<<<< HEAD
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+=======
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+>>>>>>> Firestore
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.rememberAsyncImagePainter
+import com.cloudinary.android.MediaManager
+import com.cloudinary.android.callback.ErrorInfo
+import com.cloudinary.android.callback.UploadCallback
 import com.example.socialconnect.R
 import com.example.socialconnect.dataModel.PostData
+<<<<<<< HEAD
 import kotlinx.coroutines.launch
+=======
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+
+>>>>>>> Firestore
 
 @Preview
 @Composable
 fun ProfileScreen() {
+<<<<<<< HEAD
     val isDrawerOpen by remember {  mutableStateOf(false)}
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -91,6 +108,75 @@ fun ProfileScreen() {
                             fontSize = 20.sp,
                             fontFamily = FontFamily(Font(R.font.roboto_regular))
 =======
+=======
+    var profileImageUrl by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val userID = FirebaseAuth.getInstance().currentUser!!.uid
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            uploadImageToCloudinary(context = context, fileUri = it,
+                onSuccess = { imageUrl ->
+                    profileImageUrl = imageUrl
+                   if(imageUrl.isNotEmpty()){
+                       uploadImageToFireStore(
+                           imageURl = imageUrl,
+                           onSuccess = { Toast.makeText(context, "Image uploaded successfully", Toast.LENGTH_SHORT).show() },
+                           onError = { Toast.makeText(context, "Image not uploaded", Toast.LENGTH_SHORT).show()},
+                           userId = userID
+                       )
+                   }
+                },
+                onError = { error ->
+                    Toast.makeText(context, "Error: $error", Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
+    }
+    LaunchedEffect(userID) {
+        fetchFromFirestore(userID) { imageUrl ->
+            profileImageUrl = imageUrl
+        }
+    }
+
+    Scaffold { innerPadding ->
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Profile Screen",
+                        modifier = Modifier,
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto_regular))
+                    )
+                    IconButton(onClick = { }) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Settings"
+                        )
+                    }
+                }
+
+                // Profile Details and Image Upload Button
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp, 0.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(modifier = Modifier) {
+                        Text(
+                            text = "Mohammad Saud",
+>>>>>>> Firestore
                             fontSize = 22.sp,
                             fontFamily = FontFamily(Font(R.font.roboto_bold))
                         )
@@ -98,13 +184,18 @@ fun ProfileScreen() {
                             text = "mohammadsaud_attari",
                             fontSize = 15.sp,
                             fontFamily = FontFamily(Font(R.font.roboto_regular)),
-                            modifier = Modifier.padding(0.dp, 7.dp, 0.dp, 0.dp)
+                            modifier = Modifier.padding(top = 7.dp)
                         )
                         Text(
-                            text = "100 follower",
+                            text = "100 followers",
                             fontSize = 13.sp,
+<<<<<<< HEAD
                             modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp),
                             color = Color.Gray
+>>>>>>> Firestore
+=======
+                            color = Color.Gray,
+                            modifier = Modifier.padding(top = 10.dp)
 >>>>>>> Firestore
                         )
                         Icon(
@@ -116,6 +207,7 @@ fun ProfileScreen() {
                                 }
                             })
                     }
+<<<<<<< HEAD
 <<<<<<< HEAD
                     Row(
                         modifier = Modifier
@@ -130,10 +222,18 @@ fun ProfileScreen() {
                         onClick = {
 
                         },
+=======
+                    Box(
+>>>>>>> Firestore
                         modifier = Modifier
-                            .background(shape = CircleShape, color = Color.LightGray)
-                            .padding(5.dp)
+                            .size(60.dp)
+                            .clip(CircleShape)
+                            .background(Color.LightGray)
+                            .clickable {
+                                imagePickerLauncher.launch("image/*") // Open image picker
+                            }
                     ) {
+<<<<<<< HEAD
                         Icon(
                             imageVector = Icons.Default.PersonAddAlt1,
                             contentDescription = "Add profile Image",
@@ -267,10 +367,36 @@ fun ProfileScreen() {
                     PostsLazyCol()
 >>>>>>> Firestore
                 }
+=======
+                        if (profileImageUrl.isNotEmpty()) {
+                            Image(
+                                painter = rememberAsyncImagePainter(profileImageUrl),
+                                contentDescription = "Profile Image",
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .clip(CircleShape)
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.PersonAddAlt1,
+                                contentDescription = "Add Profile Image",
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .align(Alignment.Center)
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+                // Posts Section
+                PostsLazyCol()
+>>>>>>> Firestore
             }
         }
     }
 }
+
 
 @Composable
 fun PostItemsDesign(listOfPost: PostData) {
@@ -279,7 +405,7 @@ fun PostItemsDesign(listOfPost: PostData) {
             .fillMaxWidth()
             .padding(vertical = 12.dp)
             .background(Color.White),
-        colors =CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(3.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
@@ -331,10 +457,12 @@ fun PostItemsDesign(listOfPost: PostData) {
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(Color.LightGray)) {  }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(Color.LightGray)
+            ) { }
 //            Action button like, comment
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
@@ -379,6 +507,53 @@ fun PostsLazyCol() {
     }
 }
 
+
+fun uploadImageToCloudinary(context: Context, fileUri: Uri, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+    MediaManager.get().upload(fileUri)
+        .callback(object : UploadCallback {
+            override fun onStart(requestId: String?) {
+                Toast.makeText(context, "Upload Started....", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onProgress(requestId: String?, bytes: Long, totalBytes: Long) {
+                val progress = (bytes.toDouble() / totalBytes) * 100
+                Toast.makeText(context, "Upload Progress ${progress.toInt()}%", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onSuccess(requestId: String?, resultData: MutableMap<Any?, Any?>?) {
+                val imageUrl = resultData?.get("url") as String
+                onSuccess(imageUrl)
+                Toast.makeText(context, "Upload Success", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onError(requestId: String?, error: ErrorInfo?) {
+                Toast.makeText(context, "Upload Error", Toast.LENGTH_SHORT).show()
+                onError(error.toString())
+            }
+
+            override fun onReschedule(requestId: String?, error: ErrorInfo?) {}
+
+        }).dispatch()
+
+}
+
+fun uploadImageToFireStore(userId: String,imageURl: String, onSuccess: () -> Unit,onError: () -> Unit) {
+    val db = FirebaseFirestore.getInstance()
+    val userDoc = db.collection("users").document(userId)
+    val data = hashMapOf("profilePicture" to imageURl)
+    userDoc.set(data, SetOptions.merge())
+        .addOnSuccessListener { onSuccess() }
+        .addOnFailureListener { onError() }
+}
+
+fun fetchFromFirestore(userId: String, onSuccess: (String) -> Unit){
+    val db = FirebaseFirestore.getInstance()
+    val userDoc = db.collection("users").document(userId)
+    userDoc.get().addOnSuccessListener { documentSnapshot ->
+        val imageUrl = documentSnapshot.getString("profilePicture")
+        imageUrl?.let { onSuccess(it) }
+    }
+}
 
 
 

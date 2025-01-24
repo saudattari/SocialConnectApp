@@ -162,9 +162,3 @@ fun RegistrationScreen(navHostController: NavHostController) {
         )
     }
 }
-
-fun generateNonce(length: Int = 32): String? {
-    val nonce = ByteArray(length)
-    SecureRandom().nextBytes(nonce)
-    return Base64.encodeToString(nonce, Base64.URL_SAFE or Base64.NO_PADDING)
-}

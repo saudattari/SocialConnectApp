@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">LinkUp</string>
+    <string name="api_key">115786549278838</string>
+    <string name="api_secret">n15WBkiN_inZ0w1aogAKVhLr0Q8</string>
+    <string name="cloud_name">dfwynwymk</string>
     <string name="default_web_client_id">369880025464-l42pldr6lodi976aqfigpt7r6ftvuqs8.apps.googleusercontent.com</string>
+
 </resources>

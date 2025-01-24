@@ -86,6 +86,15 @@ dependencies {
     implementation ("androidx.compose.material:material-icons-extended-android:1.7.6")
     implementation("io.coil-kt.coil3:coil-compose:3")
 
+//    Cloudinary
+    // All:
+    implementation ("com.cloudinary:cloudinary-android:3.0.2")
+
+// Download + Preprocess:
+    implementation ("com.cloudinary:cloudinary-android-download:3.0.2")
+    implementation ("com.cloudinary:cloudinary-android-preprocess:3.0.2")
+
+
 
 
 }
