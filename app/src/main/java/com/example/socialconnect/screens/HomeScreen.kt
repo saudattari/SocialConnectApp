@@ -111,7 +111,7 @@ fun HomeScreen() {
                         .background(Color.LightGray)
                 ) { }
 
-                Column(modifier = Modifier.fillMaxWidth().padding(bottom = 65.dp)) {
+                Column(modifier = Modifier.fillMaxWidth().padding(bottom = 40.dp)) {
                     LazyCol()
                 }
 

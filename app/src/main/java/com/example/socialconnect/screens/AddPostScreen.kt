@@ -23,10 +23,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.CameraEnhance
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.FloatingActionButton
@@ -55,6 +53,7 @@ import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
 import com.example.socialconnect.R
+import com.example.socialconnect.dataModel.PostData
 import com.example.socialconnect.ui.theme.clickColor
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -68,9 +67,10 @@ fun AddPostScreen() {
     val listImages = mutableListOf<String>()
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
     val currentUser = auth.currentUser?.uid
-    var addedButtonSate = false
     var imageUrlState by remember { mutableStateOf("") }
+
     val imageLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
                 uploadImageToCloudinary(
@@ -79,7 +79,6 @@ fun AddPostScreen() {
                     onSuccess = { fileUri ->
                         imageUrlState = fileUri
                         listImages.add(imageUrlState)
-                        addedButtonSate = true
                     }
 
                 )
@@ -88,20 +87,23 @@ fun AddPostScreen() {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-
                 onClick = {
                     currentUser?.let {
-                        uploadContentToFireStore(
-                            context = context,
-                            currentUser = it,
-                            content = postText,
-                            imageUrl = listImages,
-                            onSuccess = {
-                                Toast.makeText(context, "Post published", Toast.LENGTH_SHORT).show()
-                                postText = ""
-                                listImages.clear()
-                            },
-                        )
+                        if(postText.isNotEmpty()){
+                            val postId =db.collection("posts").document().id
+                            val post = PostData(
+                                postId =postId,
+                                userId = it,
+                                timeAgo = System.currentTimeMillis(),
+                                postContent = postText,
+                                postImage = listImages.ifEmpty { null },
+                            )
+                            addPost(
+                                post = post,
+                                onSuccess = { Toast.makeText(context, "Post added", Toast.LENGTH_SHORT).show() },
+                                context = context
+                            )
+                        }
                     }
                 },
                 Modifier.clip(RoundedCornerShape(50.dp)),
@@ -181,7 +183,6 @@ fun AddPostScreen() {
                     Spacer(modifier = Modifier.height(8.dp))
 
                     if (listImages.isNotEmpty()) {
-
                         for(url in listImages){
                             Row(
                                 modifier = Modifier
@@ -261,9 +262,9 @@ fun uploadImageToCloudinary(fileUri: Uri, onSuccess: (String) -> Unit, context: 
         }
 
         override fun onSuccess(requestId: String?, resultData: MutableMap<Any?, Any?>?) {
-            val fileUri = resultData?.get("url") as String
+            val fileUrl = resultData?.get("url") as String
             Toast.makeText(context, "Uploading completed", Toast.LENGTH_SHORT).show()
-            onSuccess(fileUri)
+            onSuccess(fileUrl)
         }
 
         override fun onError(requestId: String?, error: ErrorInfo?) {
@@ -276,28 +277,9 @@ fun uploadImageToCloudinary(fileUri: Uri, onSuccess: (String) -> Unit, context: 
     })
 }
 
-fun uploadContentToFireStore(
-    context: Context,
-    currentUser: String,
-    content: String,
-    imageUrl:List<String>,
-    onSuccess: () -> Unit
-) {
+fun addPost(post:PostData, onSuccess: () -> Unit,context: Context){
     val db = FirebaseFirestore.getInstance()
-    val postDocRef = db.collection("posts").document(currentUser)
-    val data = hashMapOf(
-        "content" to content,
-        "ContentImage" to imageUrl,
-        "userId" to currentUser
-    )
-    postDocRef.set(data, SetOptions.merge()).addOnSuccessListener {
-        onSuccess()
-    }
-        .addOnFailureListener {
-            Toast.makeText(
-                context,
-                "Sorry! getting error while uploading post on FireStore",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+    val postDocRef = db.collection("posts").document(post.postId)
+    postDocRef.set(post).addOnSuccessListener { onSuccess() }
+        .addOnFailureListener { Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show() }
 }
