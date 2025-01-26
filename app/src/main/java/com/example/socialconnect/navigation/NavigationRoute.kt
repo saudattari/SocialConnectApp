@@ -6,4 +6,5 @@ sealed class NavigationRoute(val route: String) {
     data object LoginScreen: NavigationRoute(route ="LoginScreen")
     data object RegistrationScreen : NavigationRoute(route ="RegistrationScreen")
     data object MainScreen : NavigationRoute(route ="MainScreen")
+    data object AddPostScreen : NavigationRoute(route ="AddPostScreen")
 }

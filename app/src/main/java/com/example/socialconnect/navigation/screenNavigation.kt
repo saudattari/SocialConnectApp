@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.example.socialconnect.screens.AddPostScreen
 import com.example.socialconnect.screens.HomeScreen
 import com.example.socialconnect.screens.LogInScreen
 import com.example.socialconnect.screens.MainScreen
@@ -32,8 +33,8 @@ fun ScreenNavigation(navController: NavHostController) {
         composable(NavigationRoute.RegistrationScreen.route) {
                 RegistrationScreen(navController)
         }
-        composable(NavigationRoute.MainScreen.route){
-            MainScreen()
+        composable(NavigationRoute.AddPostScreen.route){
+            AddPostScreen()
         }
     }
 }
