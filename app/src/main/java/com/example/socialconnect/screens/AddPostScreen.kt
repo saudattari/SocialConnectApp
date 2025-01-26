@@ -13,11 +13,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -27,6 +30,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Tag
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,6 +39,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -63,24 +68,35 @@ import com.google.firebase.firestore.SetOptions
 @Composable
 fun AddPostScreen() {
     var postText by remember { mutableStateOf("") }
-    val scrollImage = rememberScrollState()
-    val listImages = mutableListOf<String>()
+    val listImages = remember { mutableStateListOf<String>() }
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
     val currentUser = auth.currentUser?.uid
-    var imageUrlState by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+
+//    LoadingScreen
+    if(isLoading){
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f)), contentAlignment = Alignment.Center){
+            CircularProgressIndicator(color = Color.White)
+        }
+    }
 
     val imageLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
-                uploadImageToCloudinary(
-                    context = context,
+                isLoading = true
+                uploadImageToCloudinar(
                     fileUri = it,
-                    onSuccess = { fileUri ->
-                        imageUrlState = fileUri
-                        listImages.add(imageUrlState)
+                    onSuccess = {fileUri->
+                        listImages.add(fileUri)
+                        isLoading = false
+                    },
+                    context = context,
+                    onError = {
+                        isLoading = false
                     }
-
                 )
             }
         }
@@ -89,7 +105,7 @@ fun AddPostScreen() {
             FloatingActionButton(
                 onClick = {
                     currentUser?.let {
-                        if(postText.isNotEmpty()){
+                        if(postText.isNotEmpty() || listImages.isNotEmpty()){
                             val postId =db.collection("posts").document().id
                             val post = PostData(
                                 postId =postId,
@@ -100,9 +116,15 @@ fun AddPostScreen() {
                             )
                             addPost(
                                 post = post,
-                                onSuccess = { Toast.makeText(context, "Post added", Toast.LENGTH_SHORT).show() },
+                                onSuccess = { Toast.makeText(context, "Post added", Toast.LENGTH_SHORT).show()
+                                    postText = "" // Reset text field
+                                    listImages.clear() // Clear images
+                                     },
                                 context = context
                             )
+                        }
+                        else{
+                            Toast.makeText(context, "Add text or Image", Toast.LENGTH_SHORT).show()
                         }
                     }
                 },
@@ -115,7 +137,7 @@ fun AddPostScreen() {
         }
 
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Column(modifier = Modifier.fillMaxWidth()) {
 
                 Row(
@@ -183,21 +205,23 @@ fun AddPostScreen() {
                     Spacer(modifier = Modifier.height(8.dp))
 
                     if (listImages.isNotEmpty()) {
-                        for(url in listImages){
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .horizontalScroll(scrollImage)
-                                    .height(80.dp)
-                            ) {
+                        LazyRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                        ) {
+                            items(listImages) { url ->
                                 Image(
                                     painter = rememberAsyncImagePainter(url),
-                                    contentDescription = "PotContentPicture"
+                                    contentDescription = "Uploaded Image",
+                                    modifier = Modifier
+                                        .size(80.dp)
+                                        .padding(end = 8.dp)
                                 )
                             }
                         }
-
                     }
+
 
 //                    add Action buttons
                     Row(
@@ -248,17 +272,15 @@ fun AddPostScreen() {
     }
 }
 
-fun uploadImageToCloudinary(fileUri: Uri, onSuccess: (String) -> Unit, context: Context) {
-    MediaManager.get().upload(fileUri).callback(object : UploadCallback {
+fun uploadImageToCloudinar(fileUri: Uri, onSuccess: (String) -> Unit, context: Context,onError: () -> Unit) {
+    MediaManager.get().upload(fileUri).option("folder", "Social Connect").callback(object : UploadCallback {
         override fun onStart(requestId: String?) {
             Toast.makeText(context, "Upload started", Toast.LENGTH_SHORT).show()
 
         }
 
         override fun onProgress(requestId: String?, bytes: Long, totalBytes: Long) {
-            val totalTime = (bytes.toDouble() / totalBytes) * 100
-            Toast.makeText(context, "Uploading started...${totalTime.toInt()}", Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(context, "In Progress", Toast.LENGTH_SHORT).show()
         }
 
         override fun onSuccess(requestId: String?, resultData: MutableMap<Any?, Any?>?) {
@@ -268,7 +290,7 @@ fun uploadImageToCloudinary(fileUri: Uri, onSuccess: (String) -> Unit, context: 
         }
 
         override fun onError(requestId: String?, error: ErrorInfo?) {
-            Toast.makeText(context, "Uploading problem", Toast.LENGTH_SHORT).show()
+            onError()
         }
 
         override fun onReschedule(requestId: String?, error: ErrorInfo?) {

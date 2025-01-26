@@ -35,6 +35,11 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,10 +54,19 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.rememberAsyncImagePainter
 import com.example.socialconnect.R
 import com.example.socialconnect.dataModel.PostData
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.toObject
+import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Preview
 @Composable
 fun HomeScreen() {
+    val auth = FirebaseAuth.getInstance()
+    val currentUser = auth.currentUser?.uid
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier
@@ -111,8 +125,10 @@ fun HomeScreen() {
                         .background(Color.LightGray)
                 ) { }
 
-                Column(modifier = Modifier.fillMaxWidth().padding(bottom = 40.dp)) {
-                    LazyCol()
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 40.dp)) {
+                        LazyCol()
                 }
 
             }
@@ -141,7 +157,7 @@ fun FeedItemsDesign(listOfPost: PostData) {
                 modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = rememberAsyncImagePainter(listOfPost.profileImage),
+                    painter = rememberAsyncImagePainter(R.drawable.logo),
                     contentDescription = "Profile Image",
                     modifier = Modifier
                         .size(40.dp)
@@ -149,18 +165,22 @@ fun FeedItemsDesign(listOfPost: PostData) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = listOfPost.userName, fontWeight = FontWeight.Bold, fontSize = 16.sp
+                    text = listOfPost.userId, fontWeight = FontWeight.Bold, fontSize = 16.sp
                 )
                 Text(
-                    text = listOfPost.timeAgo,
+                    text = calculateTimeStamp(listOfPost.timeAgo),
                     fontSize = 12.sp,
                     color = Color.Gray,
                     modifier = Modifier.padding(horizontal = 6.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    imageVector = Icons.Default.MoreHoriz, contentDescription = "More Options"
-                )
+                IconButton(onClick = {
+
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreHoriz, contentDescription = "More Options"
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -170,15 +190,19 @@ fun FeedItemsDesign(listOfPost: PostData) {
                 fontSize = 14.sp,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
-            listOfPost.postImage?.let {
-                Image(
-                    painter = rememberAsyncImagePainter(it),
-                    contentDescription = "Post Image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(80.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                )
+            for (image in listOfPost.postImage!!){
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp)) {
+                    Image(
+                        painter = rememberAsyncImagePainter(image),
+                        contentDescription = "Post Image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(80.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(8.dp))
             Row(
@@ -210,28 +234,44 @@ fun FeedItemsDesign(listOfPost: PostData) {
 
 @Composable
 fun LazyCol() {
-    val postList = listOf(
-        PostData(
-            userName = "mohammadsaud_attari",
-            timeAgo = "3h",
-            profileImage = R.drawable.photo,
-            postContent = "I'm Saud and I am an Android Developer. This is my new App Logo",
-            postImage = R.drawable.logo
-        ), PostData(
-            userName = "hafiz_farhan",
-            timeAgo = "5h",
-            profileImage = R.drawable.farhan,
-            postContent = "Excited to share my new blog post! Excited to share my new blog post! Excited to share my new blog post!",
-        ), PostData(
-            userName = "hafiz_farhan",
-            timeAgo = "5h",
-            profileImage = R.drawable.farhan,
-            postContent = "Excited to share my new blog post! Excited to share my new blog post! Excited to share my new blog post!",
-        )
-    )
+    val db = FirebaseFirestore.getInstance()
+    val context = LocalContext.current
+    var postList by remember { mutableStateOf<List<PostData>>(emptyList())  }
+   LaunchedEffect(Unit) {
+       try{
+           val dbs = db.collection("posts")
+               .orderBy("timeAgp", Query.Direction.DESCENDING)
+               .get()
+               .await()
+           val post = dbs.documents.mapNotNull { it.toObject(PostData::class.java) }
+           postList = post
+       }catch (e:Exception){
+           Toast.makeText(context, "Error loading posts: ${e.message}", Toast.LENGTH_SHORT).show()
+       }
+   }
     LazyColumn {
-        items(postList) { post ->
+        items(postList){post->
             FeedItemsDesign(post)
+        }
+    }
+}
+
+fun calculateTimeStamp(timeStamp:Long):String{
+    val currentTime = System.currentTimeMillis()
+    val timeDifference = currentTime - timeStamp
+    val minutes = timeDifference / 60000
+    val hour = timeDifference / 3600000
+    val days = timeDifference / 86400000
+
+    return when{
+        minutes < 1 -> "just now"
+        minutes < 60 -> "$minutes minutes ago"
+        hour < 24 -> "$hour hours ago"
+        days == 1L -> "Yesterday"
+        days<7 -> "$days days ago"
+        else->{
+         val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            sdf.format(timeStamp)
         }
     }
 }

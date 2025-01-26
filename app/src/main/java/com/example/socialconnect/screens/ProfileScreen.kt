@@ -51,6 +51,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,9 +61,11 @@ import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
 import com.example.socialconnect.R
 import com.example.socialconnect.dataModel.PostData
+import com.example.socialconnect.dataModel.ProfileData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.tasks.await
 
 
 @Preview
@@ -70,6 +73,7 @@ import com.google.firebase.firestore.SetOptions
 fun ProfileScreen() {
     var profileImageUrl by remember { mutableStateOf("") }
     val context = LocalContext.current
+    val db = FirebaseFirestore.getInstance()
     val userID = FirebaseAuth.getInstance().currentUser!!.uid
 
     val imagePickerLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -93,9 +97,9 @@ fun ProfileScreen() {
         }
     }
     LaunchedEffect(userID) {
-        fetchFromFirestore(userID) { imageUrl ->
-            profileImageUrl = imageUrl
-        }
+        fetchFromFirestore(userID, onSuccess = {
+            profileImageUrl = it.profilePicture
+        })
     }
 
     Scaffold { innerPadding ->
@@ -159,6 +163,7 @@ fun ProfileScreen() {
                             .clickable {
                                 imagePickerLauncher.launch("image/*") // Open image picker
                             }
+                        , contentAlignment = Alignment.Center
                     ) {
                         if (profileImageUrl.isNotEmpty()) {
                             Image(
@@ -182,11 +187,13 @@ fun ProfileScreen() {
 
                 Spacer(modifier = Modifier.height(20.dp))
                 // Posts Section
-                PostsLazyCol()
+                PostLazyCol(db = db, currentUser = userID)
             }
         }
     }
 }
+
+
 
 
 @Composable
@@ -209,7 +216,7 @@ fun PostItemsDesign(listOfPost: PostData) {
                 modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = rememberAsyncImagePainter(listOfPost.profileImage),
+                    painter = rememberAsyncImagePainter(R.drawable.photo),
                     contentDescription = "Profile Image",
                     modifier = Modifier
                         .size(40.dp)
@@ -217,10 +224,10 @@ fun PostItemsDesign(listOfPost: PostData) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = listOfPost.userName, fontWeight = FontWeight.Bold, fontSize = 16.sp
+                    text = "", fontWeight = FontWeight.Bold, fontSize = 16.sp
                 )
                 Text(
-                    text = listOfPost.timeAgo,
+                    text = "5h",
                     fontSize = 12.sp,
                     color = Color.Gray,
                     modifier = Modifier.padding(horizontal = 6.dp)
@@ -278,26 +285,33 @@ fun PostItemsDesign(listOfPost: PostData) {
 }
 
 @Composable
-fun PostsLazyCol() {
-    val postList = listOf(
-        PostData(
-            userName = "mohammadsaud_attari",
-            timeAgo = "3h",
-            profileImage = R.drawable.photo,
-            postContent = "I'm Saud and I am an Android Developer.",
-            postImage = R.drawable.photo
-        ), PostData(
-            userName = "hafiz_farhan",
-            timeAgo = "5h",
-            profileImage = R.drawable.farhan,
-            postContent = "Excited to share my new blog post!",
+fun PostLazyCol(db: FirebaseFirestore, currentUser:String) {
+    var listOfPost by remember { mutableStateOf<List<PostData>>(emptyList()) }
+    LaunchedEffect(Unit) {
+       val dbRef =  db.collection("posts")
+            .whereEqualTo("userId", currentUser)
+            .get()
+            .await()
+        val post = dbRef.documents.mapNotNull {
+            it.toObject(PostData::class.java)
+        }
+        listOfPost = post
+    }
+    if (listOfPost.isEmpty()) {
+        Text(
+            text = "No posts to display",
+            modifier = Modifier, textAlign = TextAlign.Center,
+            fontSize = 16.sp,
+            color = Color.Gray
         )
-    )
-    LazyColumn() {
-        items(postList) { post ->
-            PostItemsDesign(post)
+    } else {
+        LazyColumn {
+            items(listOfPost) {
+                PostItemsDesign(it)
+            }
         }
     }
+
 }
 
 
@@ -333,21 +347,25 @@ fun uploadImageToCloudinary(context: Context, fileUri: Uri, onSuccess: (String) 
 fun uploadImageToFireStore(userId: String,imageURl: String, onSuccess: () -> Unit,onError: () -> Unit) {
     val db = FirebaseFirestore.getInstance()
     val userDoc = db.collection("users").document(userId)
-    val data = hashMapOf("profilePicture" to imageURl)
+
+    val data = ProfileData(profilePicture = imageURl)
     userDoc.set(data, SetOptions.merge())
         .addOnSuccessListener { onSuccess() }
         .addOnFailureListener { onError() }
 }
 
-fun fetchFromFirestore(userId: String, onSuccess: (String) -> Unit){
+
+fun fetchFromFirestore(userID: String, onSuccess: (ProfileData) -> Unit) {
     val db = FirebaseFirestore.getInstance()
-    val userDoc = db.collection("users").document(userId)
-    userDoc.get().addOnSuccessListener { documentSnapshot ->
-        val imageUrl = documentSnapshot.getString("profilePicture")
-        imageUrl?.let { onSuccess(it) }
-    }
+    val userDoc = db.collection("users").document(userID)
+    userDoc.get()
+        .addOnSuccessListener { documentSnapshot ->
+            if (documentSnapshot.exists()) {
+                val profileData = documentSnapshot.toObject(ProfileData::class.java)
+                profileData?.let {
+                    onSuccess(it)
+                }
+            }
+
+        }
 }
-
-
-
-
