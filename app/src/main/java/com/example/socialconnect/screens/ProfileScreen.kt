@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -198,6 +199,7 @@ fun ProfileScreen() {
 
 @Composable
 fun PostItemsDesign(listOfPost: PostData) {
+    var expanded by remember { mutableStateOf(false) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -233,9 +235,15 @@ fun PostItemsDesign(listOfPost: PostData) {
                     modifier = Modifier.padding(horizontal = 6.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    imageVector = Icons.Default.MoreHoriz, contentDescription = "More Options"
-                )
+                IconButton(onClick = {expanded = true }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreHoriz, contentDescription = "More Options"
+                    )
+                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        Text(text = "Edit", modifier = Modifier.clickable { expanded = false })
+                        Text(text = "Delete", modifier = Modifier.clickable {  expanded = false})
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
