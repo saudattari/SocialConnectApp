@@ -1,5 +1,6 @@
 package com.example.socialconnect.screens
 
+import android.nfc.Tag
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Person
@@ -148,6 +150,14 @@ fun FeedItemsDesign(listOfPost: PostData) {
     var commentOpen by remember { mutableStateOf(false) }
     var commentList by remember { mutableStateOf<List<CommentData>>(emptyList()) }
     val db = FirebaseFirestore.getInstance()
+    var isLiked by remember { mutableStateOf(false) }
+    CheckLikeDefaultState(
+        db = db, postId = listOfPost.postId,
+        userId = listOfPost.userId,
+        onComplete = {
+            isLiked = it
+        }
+    )
     if (commentOpen) {
         Box(
             modifier = Modifier
@@ -182,7 +192,9 @@ fun FeedItemsDesign(listOfPost: PostData) {
                 else{
                     Toast.makeText(context, "Sorry! there is no comment yet", Toast.LENGTH_SHORT).show()
                 }
-                Spacer(modifier = Modifier.height(20.dp).weight(1f))
+                Spacer(modifier = Modifier
+                    .height(20.dp)
+                    .weight(1f))
                 Row(modifier = Modifier.fillMaxWidth()) {
                     OutlinedTextField(
                         value = commentPost,
@@ -305,8 +317,12 @@ fun FeedItemsDesign(listOfPost: PostData) {
             Row(
                 modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
             ) {
-                IconButton(onClick = { }) {
-                    Icon(imageVector = Icons.Default.FavoriteBorder, contentDescription = "Like")
+                IconButton(onClick = {
+                    ToggleLike(listOfPost.postId, listOfPost.userId){
+                        isLiked = it
+                    }
+                }) {
+                    Icon(imageVector = if(isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder, contentDescription = "Like Button", tint = if (isLiked) Color.Red else Color.Black)
                 }
                 IconButton(onClick = {
                     commentOpen = true
@@ -321,6 +337,20 @@ fun FeedItemsDesign(listOfPost: PostData) {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun CheckLikeDefaultState(db:FirebaseFirestore,postId: String,userId: String,onComplete: (Boolean) -> Unit) {
+    var isLiked by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        val dbRef = db.collection("posts").document(postId)
+            .get()
+            .addOnSuccessListener {
+                val likes = it.get("likes") as? Map<String,Boolean> ?: emptyMap()
+                isLiked = likes.containsKey(userId)
+                onComplete(isLiked)
+            }
     }
 }
 
@@ -427,25 +457,36 @@ fun CommentDesign(commentData: CommentData) {
     }
 }
 
-fun toggleLike(postId: String,userId: String){
+fun ToggleLike(postId: String,userId: String,onComplete: (Boolean) ->Unit){
     val db = FirebaseFirestore.getInstance()
     val dbRef = db.collection("posts").document(postId)
     db.runTransaction { transaction->
         val snapshot = transaction.get(dbRef)
         val likes = snapshot.get("likes") as? MutableMap<String, Boolean> ?:mutableMapOf()
-        if(likes.containsKey(userId)){
+        val isLike = if(likes.containsKey(userId)){
             likes.remove(userId)
+            false
         }
         else{
             likes[userId] = true
+            true
         }
-
-
+        transaction.update(dbRef, "likes",likes)
+        isLike
     }
+        .addOnSuccessListener { onComplete(it) }
+        .addOnFailureListener { onComplete(false) }
 }
+
 fun addComment(postId:String ,commentData: CommentData, onSuccess:()->Unit) {
     val db = FirebaseFirestore.getInstance()
-    db.collection("posts").document(postId).collection("comments")
-        .add(commentData)
-        .addOnSuccessListener { onSuccess() }
+    val dbRef = db.collection("posts").document(postId)
+        dbRef.get().addOnSuccessListener {
+            if (it.exists()){
+                dbRef.collection("comments").add(commentData)
+                    .addOnSuccessListener { onSuccess() }
+                    .addOnFailureListener {  }
+            }
+        }.addOnFailureListener {  }
+
 }
