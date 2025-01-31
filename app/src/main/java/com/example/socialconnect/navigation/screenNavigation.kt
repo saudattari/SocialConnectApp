@@ -11,6 +11,7 @@ import com.example.socialconnect.screens.AddPostScreen
 import com.example.socialconnect.screens.HomeScreen
 import com.example.socialconnect.screens.LogInScreen
 import com.example.socialconnect.screens.MainScreen
+import com.example.socialconnect.screens.OtherProfileScreen
 import com.example.socialconnect.screens.ProfileScreen
 import com.example.socialconnect.screens.RegistrationScreen
 import com.example.socialconnect.screens.SettingsScreen
@@ -34,7 +35,14 @@ fun ScreenNavigation(navController: NavHostController) {
                 RegistrationScreen(navController)
         }
         composable(NavigationRoute.MainScreen.route) {
-                MainScreen()
+                MainScreen(navController)
+        }
+        composable(NavigationRoute.Profile.route) {
+                ProfileScreen()
+        }
+        composable(NavigationRoute.OtherProfileScreen.route) {
+            val userId = it.arguments?.getString("userId") ?:""
+            OtherProfileScreen(userId)
         }
 
     }

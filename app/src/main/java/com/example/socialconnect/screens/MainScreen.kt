@@ -21,12 +21,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.socialconnect.Objects.BottomNavigationItemListData.NavigationItemsList
 import com.example.socialconnect.ui.theme.focusColor
 
-@Preview
 @Composable
-fun MainScreen() {
+fun MainScreen(navHostController: NavHostController) {
     var clickIndex by rememberSaveable { mutableStateOf(0) }
     Scaffold(modifier = Modifier.fillMaxSize(),
         bottomBar = {
@@ -57,17 +57,18 @@ fun MainScreen() {
         ContentDisplay(
             modifier = Modifier.fillMaxSize()
                 .padding(innerPadding),
-            navigationSelectedIndex = clickIndex
+            navigationSelectedIndex = clickIndex,
+            navHostController
         )
     }
 }
 @Composable
-fun ContentDisplay(modifier: Modifier, navigationSelectedIndex: Int) {
+fun ContentDisplay(modifier: Modifier, navigationSelectedIndex: Int,navHostController: NavHostController) {
         when (navigationSelectedIndex) {
-            0 -> HomeScreen()
+            0 -> HomeScreen(navHostController)
             2 -> AddPostScreen()
             3 -> SettingsScreen()
             4 -> ProfileScreen()
-            else -> HomeScreen()
+            else -> HomeScreen(navHostController)
         }
 }

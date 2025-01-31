@@ -1,6 +1,5 @@
 package com.example.socialconnect.screens
 
-import android.nfc.Tag
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -55,10 +54,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import coil3.compose.rememberAsyncImagePainter
 import com.example.socialconnect.R
 import com.example.socialconnect.dataModel.CommentData
 import com.example.socialconnect.dataModel.PostData
+import com.example.socialconnect.navigation.NavigationRoute
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -66,9 +67,8 @@ import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-//@Preview
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navHostController: NavHostController) {
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier
@@ -131,7 +131,7 @@ fun HomeScreen() {
                         .fillMaxWidth()
                         .padding(bottom = 40.dp)
                 ) {
-                    LazyCol()
+                    LazyCol(navHostController)
                 }
 
             }
@@ -141,8 +141,9 @@ fun HomeScreen() {
 }
 
 @Composable
-fun FeedItemsDesign(listOfPost: PostData) {
+fun FeedItemsDesign(listOfPost: PostData, navHostController: NavHostController) {
     val context = LocalContext.current
+    var userName by remember { mutableStateOf("") }
     val auth = FirebaseAuth.getInstance()
     val currentUser = auth.currentUser?.uid
     var commentPost by remember { mutableStateOf("") }
@@ -260,9 +261,16 @@ fun FeedItemsDesign(listOfPost: PostData) {
                         .clip(RoundedCornerShape(100.dp))
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = listOfPost.userId, fontWeight = FontWeight.Bold, fontSize = 16.sp
-                )
+                userNameExtract(db = db, onComplete = {usersName-> userName = usersName }, userId = listOfPost.userId)
+                Text(text = userName, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.clickable {
+                    if (listOfPost.userId == currentUser){
+                        navHostController.navigate(NavigationRoute.Profile.route)
+                    }
+                    else{
+                        navHostController.navigate("${NavigationRoute.OtherProfileScreen}/${listOfPost.userId}")
+                    }
+                })
+
                 Text(
                     text = calculateTimeStamp(listOfPost.timeAgo),
                     fontSize = 12.sp,
@@ -314,11 +322,9 @@ fun FeedItemsDesign(listOfPost: PostData) {
                     .background(Color.LightGray)
             ) { }
 //            Action button like, comment
-            Row(
-                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
-            ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                 IconButton(onClick = {
-                    ToggleLike(listOfPost.postId, listOfPost.userId){
+                    toggleLike(listOfPost.postId, listOfPost.userId){
                         isLiked = it
                     }
                 }) {
@@ -344,7 +350,7 @@ fun FeedItemsDesign(listOfPost: PostData) {
 fun CheckLikeDefaultState(db:FirebaseFirestore,postId: String,userId: String,onComplete: (Boolean) -> Unit) {
     var isLiked by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        val dbRef = db.collection("posts").document(postId)
+        db.collection("posts").document(postId)
             .get()
             .addOnSuccessListener {
                 val likes = it.get("likes") as? Map<String,Boolean> ?: emptyMap()
@@ -354,9 +360,8 @@ fun CheckLikeDefaultState(db:FirebaseFirestore,postId: String,userId: String,onC
     }
 }
 
-
 @Composable
-fun LazyCol() {
+fun LazyCol(navHostController: NavHostController) {
     val db = FirebaseFirestore.getInstance()
     val context = LocalContext.current
     val postList = remember { mutableStateOf<List<PostData>>(emptyList()) }
@@ -374,27 +379,7 @@ fun LazyCol() {
     }
     LazyColumn {
         items(postList.value) { post ->
-            FeedItemsDesign(post)
-        }
-    }
-}
-
-fun calculateTimeStamp(timeStamp: Long): String {
-    val currentTime = System.currentTimeMillis()
-    val timeDifference = currentTime - timeStamp
-    val minutes = timeDifference / 60000
-    val hour = timeDifference / 3600000
-    val days = timeDifference / 86400000
-
-    return when {
-        minutes < 1 -> "just now"
-        minutes < 60 -> "$minutes minutes ago"
-        hour < 24 -> "$hour hours ago"
-        days == 1L -> "Yesterday"
-        days < 7 -> "$days days ago"
-        else -> {
-            val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-            sdf.format(timeStamp)
+            FeedItemsDesign(post, navHostController)
         }
     }
 }
@@ -408,10 +393,10 @@ fun CommentDesign(commentData: CommentData) {
         db.collection("users").document(commentData.userId)
             .get()
             .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    userName = document.getString("userName") ?: "Unknown"
+                userName = if (document != null && document.exists()) {
+                    document.getString("userName") ?: "Unknown"
                 } else {
-                    userName = "Unknown"
+                    "Unknown"
                 }
             }.addOnFailureListener { userName = it.message }
     }
@@ -457,7 +442,28 @@ fun CommentDesign(commentData: CommentData) {
     }
 }
 
-fun ToggleLike(postId: String,userId: String,onComplete: (Boolean) ->Unit){
+
+fun calculateTimeStamp(timeStamp: Long): String {
+    val currentTime = System.currentTimeMillis()
+    val timeDifference = currentTime - timeStamp
+    val minutes = timeDifference / 60000
+    val hour = timeDifference / 3600000
+    val days = timeDifference / 86400000
+
+    return when {
+        minutes < 1 -> "just now"
+        minutes < 60 -> "$minutes minutes ago"
+        hour < 24 -> "$hour hours ago"
+        days == 1L -> "Yesterday"
+        days < 7 -> "$days days ago"
+        else -> {
+            val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            sdf.format(timeStamp)
+        }
+    }
+}
+
+fun toggleLike(postId: String, userId: String, onComplete: (Boolean) ->Unit){
     val db = FirebaseFirestore.getInstance()
     val dbRef = db.collection("posts").document(postId)
     db.runTransaction { transaction->
@@ -481,7 +487,7 @@ fun ToggleLike(postId: String,userId: String,onComplete: (Boolean) ->Unit){
 fun addComment(postId:String ,commentData: CommentData, onSuccess:()->Unit) {
     val db = FirebaseFirestore.getInstance()
     val dbRef = db.collection("posts").document(postId)
-        dbRef.get().addOnSuccessListener {
+    dbRef.get().addOnSuccessListener {
             if (it.exists()){
                 dbRef.collection("comments").add(commentData)
                     .addOnSuccessListener { onSuccess() }
@@ -489,4 +495,14 @@ fun addComment(postId:String ,commentData: CommentData, onSuccess:()->Unit) {
             }
         }.addOnFailureListener {  }
 
+}
+
+fun userNameExtract(db:FirebaseFirestore, onComplete: (String) -> Unit, userId: String){
+    val dbRef = db.collection("users").document(userId)
+    dbRef.get()
+        .addOnSuccessListener { documentSnapshot->
+            val userName = (documentSnapshot.get("name") ?:"Unknown").toString()
+            onComplete(userName)
+        }
+        .addOnFailureListener { onComplete("Unknown") }
 }
