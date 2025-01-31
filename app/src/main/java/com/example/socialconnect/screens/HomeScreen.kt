@@ -157,14 +157,18 @@ fun FeedItemsDesign(listOfPost: PostData) {
             Column(modifier = Modifier.fillMaxSize()) {
                 LaunchedEffect(Unit) {
                     try {
-                        val dbRef = db.collection("posts").document(listOfPost.postId).collection("comments")
-                            .orderBy("timeAgo", Query.Direction.DESCENDING)
-                            .get()
-                            .await()
-                        commentList = dbRef.documents.mapNotNull {
-                            it.toObject(CommentData::class.java)
+                        val dbRef = db.collection("posts").document(listOfPost.postId)
+                            val snapShot = dbRef.get().await()
+                        if(!snapShot.exists()){
+                            Toast.makeText(context, "Collection or Document Not Exist", Toast.LENGTH_SHORT).show()
+                            return@LaunchedEffect
                         }
-                    }catch (e:Exception){
+                        val dbRef2 = dbRef.collection("comments")
+                            .orderBy("timeAgo", Query.Direction.DESCENDING).get().await()
+                        commentList = dbRef2.documents.mapNotNull { documentSnapshot ->
+                            documentSnapshot.toObject(CommentData::class.java)
+                        }
+                    } catch (e: Exception) {
                         Toast.makeText(context, "${e.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -176,10 +180,9 @@ fun FeedItemsDesign(listOfPost: PostData) {
                     }
                 }
                 else{
-                    Toast.makeText(context, "Sorry! there is no comment yet", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(context, "Sorry! there is no comment yet", Toast.LENGTH_SHORT).show()
                 }
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(20.dp).weight(1f))
                 Row(modifier = Modifier.fillMaxWidth()) {
                     OutlinedTextField(
                         value = commentPost,
