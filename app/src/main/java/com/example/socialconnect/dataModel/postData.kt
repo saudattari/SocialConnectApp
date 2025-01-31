@@ -3,7 +3,7 @@ package com.example.socialconnect.dataModel
 data class PostData(
     val userId : String,
     val postId : String,
-    val timeAgo: Long = System.currentTimeMillis(),
+    val timeAgo: Long = 0L,
     val postContent: String,
     val postImage: List<String>? = null,
     val likes : Int = 0,

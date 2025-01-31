@@ -33,8 +33,9 @@ fun ScreenNavigation(navController: NavHostController) {
         composable(NavigationRoute.RegistrationScreen.route) {
                 RegistrationScreen(navController)
         }
-        composable(NavigationRoute.AddPostScreen.route){
-            AddPostScreen()
+        composable(NavigationRoute.MainScreen.route) {
+                MainScreen()
         }
+
     }
 }

@@ -1,6 +1,5 @@
 package com.example.socialconnect.screens
 
-import android.widget.Space
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,9 +20,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -48,31 +48,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.rememberAsyncImagePainter
 import com.example.socialconnect.R
+import com.example.socialconnect.dataModel.CommentData
 import com.example.socialconnect.dataModel.PostData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-@Preview
+//@Preview
 @Composable
 fun HomeScreen() {
-    val auth = FirebaseAuth.getInstance()
-    val currentUser = auth.currentUser?.uid
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize()
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
 //                Main logo
@@ -126,10 +124,12 @@ fun HomeScreen() {
                         .background(Color.LightGray)
                 ) { }
 
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 40.dp)) {
-                        LazyCol()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 40.dp)
+                ) {
+                    LazyCol()
                 }
 
             }
@@ -140,7 +140,85 @@ fun HomeScreen() {
 
 @Composable
 fun FeedItemsDesign(listOfPost: PostData) {
+    val context = LocalContext.current
+    val auth = FirebaseAuth.getInstance()
+    val currentUser = auth.currentUser?.uid
+    var commentPost by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
+    var commentOpen by remember { mutableStateOf(false) }
+    var commentList by remember { mutableStateOf<List<CommentData>>(emptyList()) }
+    val db = FirebaseFirestore.getInstance()
+    if (commentOpen) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = Color.Black.copy(alpha = 0.1f))
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                LaunchedEffect(Unit) {
+                    try {
+                        val dbRef = db.collection("posts").document(listOfPost.postId).collection("comments")
+                            .orderBy("timeAgo", Query.Direction.DESCENDING)
+                            .get()
+                            .await()
+                        commentList = dbRef.documents.mapNotNull {
+                            it.toObject(CommentData::class.java)
+                        }
+                    }catch (e:Exception){
+                        Toast.makeText(context, "${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                if(commentList.isNotEmpty()){
+                    LazyColumn {
+                        items(commentList) {
+                            CommentDesign(it)
+                        }
+                    }
+                }
+                else{
+                    Toast.makeText(context, "Sorry! there is no comment yet", Toast.LENGTH_SHORT)
+                        .show()
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = commentPost,
+                        placeholder = { Text(text = "Post a Comment") },
+                        onValueChange = {
+                            commentPost = it
+                        },
+                        shape = RoundedCornerShape(40.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        textStyle = TextStyle(fontSize = 14.sp)
+                    )
+                    IconButton(onClick = {
+                        addComment(
+                            postId = listOfPost.postId,
+                            commentData = CommentData(
+                                userName = "",
+                                commentContent = commentPost,
+                                timeAgo = System.currentTimeMillis(),
+                                userId = currentUser?:"",
+                                postId =listOfPost.postId
+                            ),
+                            onSuccess ={
+                                commentPost = ""
+                            } ,
+                        )
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Send,
+                            contentDescription = "Send Icon"
+                        )
+                    }
+                }
+            }
+        }
+    } else {
+        commentOpen = false
+    }
 
     Card(
         modifier = Modifier
@@ -177,7 +255,7 @@ fun FeedItemsDesign(listOfPost: PostData) {
                     modifier = Modifier.padding(horizontal = 6.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick  ={
+                IconButton(onClick = {
                     expanded = true
                 }) {
                     Icon(
@@ -186,7 +264,7 @@ fun FeedItemsDesign(listOfPost: PostData) {
                 }
                 DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     Text(text = "Edit", modifier = Modifier.clickable { expanded = false })
-                    Text(text = "Delete", modifier = Modifier.clickable {  expanded = false})
+                    Text(text = "Delete", modifier = Modifier.clickable { expanded = false })
                 }
             }
 
@@ -197,10 +275,12 @@ fun FeedItemsDesign(listOfPost: PostData) {
                 fontSize = 14.sp,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
-            for (image in listOfPost.postImage!!){
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)) {
+            listOfPost.postImage?.forEach { image ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp)
+                ) {
                     Image(
                         painter = rememberAsyncImagePainter(image),
                         contentDescription = "Post Image",
@@ -225,7 +305,9 @@ fun FeedItemsDesign(listOfPost: PostData) {
                 IconButton(onClick = { }) {
                     Icon(imageVector = Icons.Default.FavoriteBorder, contentDescription = "Like")
                 }
-                IconButton(onClick = { }) {
+                IconButton(onClick = {
+                    commentOpen = true
+                }) {
                     Icon(
                         imageVector = Icons.Default.ChatBubbleOutline,
                         contentDescription = "Comment"
@@ -239,46 +321,128 @@ fun FeedItemsDesign(listOfPost: PostData) {
     }
 }
 
+
 @Composable
 fun LazyCol() {
     val db = FirebaseFirestore.getInstance()
     val context = LocalContext.current
-    var postList by remember { mutableStateOf<List<PostData>>(emptyList())  }
-   LaunchedEffect(Unit) {
-       try{
-           val dbs = db.collection("posts")
-               .orderBy("timeAgp", Query.Direction.DESCENDING)
-               .get()
-               .await()
-           val post = dbs.documents.mapNotNull { it.toObject(PostData::class.java) }
-           postList = post
-       }catch (e:Exception){
-           Toast.makeText(context, "Error loading posts: ${e.message}", Toast.LENGTH_SHORT).show()
-       }
-   }
+    val postList = remember { mutableStateOf<List<PostData>>(emptyList()) }
+    LaunchedEffect(Unit) {
+        try {
+            val dbs = db.collection("posts")
+                .orderBy("timeAgo", Query.Direction.DESCENDING)
+                .get()
+                .await()
+            val post = dbs.documents.mapNotNull { it.toObject(PostData::class.java) }
+            postList.value = post
+        } catch (e: Exception) {
+            Toast.makeText(context, "Error loading posts: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
     LazyColumn {
-        items(postList){post->
+        items(postList.value) { post ->
             FeedItemsDesign(post)
         }
     }
 }
 
-fun calculateTimeStamp(timeStamp:Long):String{
+fun calculateTimeStamp(timeStamp: Long): String {
     val currentTime = System.currentTimeMillis()
     val timeDifference = currentTime - timeStamp
     val minutes = timeDifference / 60000
     val hour = timeDifference / 3600000
     val days = timeDifference / 86400000
 
-    return when{
+    return when {
         minutes < 1 -> "just now"
         minutes < 60 -> "$minutes minutes ago"
         hour < 24 -> "$hour hours ago"
         days == 1L -> "Yesterday"
-        days<7 -> "$days days ago"
-        else->{
-         val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+        days < 7 -> "$days days ago"
+        else -> {
+            val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
             sdf.format(timeStamp)
         }
     }
+}
+
+@Composable
+fun CommentDesign(commentData: CommentData) {
+    var userName by remember { mutableStateOf<String?>(null) }
+    val db = FirebaseFirestore.getInstance()
+
+    LaunchedEffect(userName) {
+        db.collection("users").document(commentData.userId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    userName = document.getString("userName") ?: "Unknown"
+                } else {
+                    userName = "Unknown"
+                }
+            }.addOnFailureListener { userName = it.message }
+    }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp)
+//            .clip(shape = RoundedCornerShape(12.dp))
+            .background(Color.LightGray),
+        elevation = CardDefaults.cardElevation(12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            Image(
+                imageVector = Icons.Default.Person, contentDescription = "", Modifier
+                    .size(45.dp)
+                    .clip(RoundedCornerShape(100.dp))
+                    .background(Color.Gray)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterVertically)
+            ) {
+                Text(
+                    text = userName!!,
+                    fontSize = 18.sp,
+                    fontFamily = FontFamily(Font(R.font.roboto_medium))
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = commentData.commentContent,
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily(Font(R.font.roboto_regular))
+                )
+            }
+
+        }
+    }
+}
+
+fun toggleLike(postId: String,userId: String){
+    val db = FirebaseFirestore.getInstance()
+    val dbRef = db.collection("posts").document(postId)
+    db.runTransaction { transaction->
+        val snapshot = transaction.get(dbRef)
+        val likes = snapshot.get("likes") as? MutableMap<String, Boolean> ?:mutableMapOf()
+        if(likes.containsKey(userId)){
+            likes.remove(userId)
+        }
+        else{
+            likes[userId] = true
+        }
+
+
+    }
+}
+fun addComment(postId:String ,commentData: CommentData, onSuccess:()->Unit) {
+    val db = FirebaseFirestore.getInstance()
+    db.collection("posts").document(postId).collection("comments")
+        .add(commentData)
+        .addOnSuccessListener { onSuccess() }
 }

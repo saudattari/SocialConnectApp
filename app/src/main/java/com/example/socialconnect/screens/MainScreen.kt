@@ -63,7 +63,6 @@ fun MainScreen() {
 }
 @Composable
 fun ContentDisplay(modifier: Modifier, navigationSelectedIndex: Int) {
-    Box(modifier = modifier){
         when (navigationSelectedIndex) {
             0 -> HomeScreen()
             2 -> AddPostScreen()
@@ -71,5 +70,4 @@ fun ContentDisplay(modifier: Modifier, navigationSelectedIndex: Int) {
             4 -> ProfileScreen()
             else -> HomeScreen()
         }
-    }
 }
